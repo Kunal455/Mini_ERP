@@ -7,18 +7,17 @@ const { createFollowUp, getFollowUps } = require("../controllers/followUpControl
 
 const router = express.Router();
 
-router.use(authenticate, authorizeRoles("ADMIN", "SALES"));
+// ACCOUNTS can view customers and follow-ups
+router.get("/", authenticate, authorizeRoles("ADMIN", "SALES", "ACCOUNTS"), getCustomers);
+router.get("/:id", authenticate, authorizeRoles("ADMIN", "SALES", "ACCOUNTS"), getCustomerById);
+router.get("/:customerId/followups", authenticate, authorizeRoles("ADMIN", "SALES", "ACCOUNTS"), getFollowUps);
 
-// Routes accessible by ADMIN and SALES
-router.post("/", createCustomer);
-router.get("/", getCustomers);
-router.get("/:id", getCustomerById);
-router.put("/:id", updateCustomer);
-
-router.post("/:customerId/followups", createFollowUp);
-router.get("/:customerId/followups", getFollowUps);
+// SALES and ADMIN can create/update customers and follow-ups
+router.post("/", authenticate, authorizeRoles("ADMIN", "SALES"), createCustomer);
+router.put("/:id", authenticate, authorizeRoles("ADMIN", "SALES"), updateCustomer);
+router.post("/:customerId/followups", authenticate, authorizeRoles("ADMIN", "SALES"), createFollowUp);
 
 // Restrict deletion to ADMIN only
-router.delete("/:id", authorizeRoles("ADMIN"), deleteCustomer);
+router.delete("/:id", authenticate, authorizeRoles("ADMIN"), deleteCustomer);
 
 module.exports = router;

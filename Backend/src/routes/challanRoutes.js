@@ -5,13 +5,14 @@ const { createChallan, getChallans, getChallanById, updateChallan, confirmChalla
 
 const router = express.Router();
 
-router.use(authenticate, authorizeRoles("ADMIN", "SALES"));
+// ACCOUNTS can view challans
+router.get("/", authenticate, authorizeRoles("ADMIN", "SALES", "ACCOUNTS"), getChallans);
+router.get("/:id", authenticate, authorizeRoles("ADMIN", "SALES", "ACCOUNTS"), getChallanById);
 
-router.post("/", createChallan);
-router.get("/", getChallans);
-router.get("/:id", getChallanById);
-router.put("/:id", updateChallan);
-router.patch("/:id/confirm", confirmChallan);
-router.patch("/:id/cancel", cancelChallan);
+// SALES and ADMIN can manage challans
+router.post("/", authenticate, authorizeRoles("ADMIN", "SALES"), createChallan);
+router.put("/:id", authenticate, authorizeRoles("ADMIN", "SALES"), updateChallan);
+router.patch("/:id/confirm", authenticate, authorizeRoles("ADMIN", "SALES"), confirmChallan);
+router.patch("/:id/cancel", authenticate, authorizeRoles("ADMIN", "SALES"), cancelChallan);
 
 module.exports = router;
