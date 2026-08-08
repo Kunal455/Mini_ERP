@@ -6,12 +6,20 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
 const authRoutes = require("./routes/authroutes");
+const userRoutes = require("./routes/userRoutes");
+const customerRoutes = require("./routes/customerRoutes");
+const followUpRoutes = require("./routes/followUpRoutes");
+const productRoutes = require("./routes/productRoutes");
+const stockRoutes = require("./routes/stockRoutes");
+const challanRoutes = require("./routes/challanRoutes");
+const adminRoutes = require("./routes/adminRoutes");
+const { errorHandler } = require("./middleware/errorMiddleware");
 
 const app = express();
 
 app.use(
     cors({
-        origin: "http://localhost:5173",
+        origin: "http://localhost:3000",
         credentials: true
     })
 );
@@ -27,6 +35,16 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/customers", customerRoutes);
+app.use("/api/followups", followUpRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/stock", stockRoutes);
+app.use("/api/challans", challanRoutes);
+app.use("/api/admin", adminRoutes);
+
+// Global Error Handler
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
