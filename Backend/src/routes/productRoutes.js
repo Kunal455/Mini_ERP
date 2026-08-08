@@ -6,14 +6,14 @@ const { getProductStockHistory } = require("../controllers/stockController");
 
 const router = express.Router();
 
-router.use(authenticate, authorizeRoles("ADMIN", "WAREHOUSE"));
+// Allow all internal roles to view products
+router.get("/", authenticate, authorizeRoles("ADMIN", "SALES", "WAREHOUSE", "ACCOUNTS"), getProducts);
+router.get("/:id", authenticate, authorizeRoles("ADMIN", "SALES", "WAREHOUSE", "ACCOUNTS"), getProductById);
+router.get("/:id/stock-history", authenticate, authorizeRoles("ADMIN", "SALES", "WAREHOUSE", "ACCOUNTS"), getProductStockHistory);
 
-router.post("/", createProduct);
-router.get("/", getProducts);
-router.get("/:id", getProductById);
-router.put("/:id", updateProduct);
-router.patch("/:id/status", updateProductStatus);
-
-router.get("/:id/stock-history", getProductStockHistory);
+// Restrict product modifications to Admin and Warehouse
+router.post("/", authenticate, authorizeRoles("ADMIN", "WAREHOUSE"), createProduct);
+router.put("/:id", authenticate, authorizeRoles("ADMIN", "WAREHOUSE"), updateProduct);
+router.patch("/:id/status", authenticate, authorizeRoles("ADMIN", "WAREHOUSE"), updateProductStatus);
 
 module.exports = router;

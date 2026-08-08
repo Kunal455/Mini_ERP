@@ -5,11 +5,12 @@ const { stockIn, stockOut, getStock, getStockMovements, getProductStockHistory }
 
 const router = express.Router();
 
-router.use(authenticate, authorizeRoles("ADMIN", "WAREHOUSE"));
+// Allow all internal roles to view stock
+router.get("/", authenticate, authorizeRoles("ADMIN", "SALES", "WAREHOUSE", "ACCOUNTS"), getStock);
+router.get("/movements", authenticate, authorizeRoles("ADMIN", "SALES", "WAREHOUSE", "ACCOUNTS"), getStockMovements);
 
-router.post("/in", stockIn);
-router.post("/out", stockOut);
-router.get("/", getStock);
-router.get("/movements", getStockMovements);
+// Restrict stock modifications to Admin and Warehouse
+router.post("/in", authenticate, authorizeRoles("ADMIN", "WAREHOUSE"), stockIn);
+router.post("/out", authenticate, authorizeRoles("ADMIN", "WAREHOUSE"), stockOut);
 
 module.exports = router;
