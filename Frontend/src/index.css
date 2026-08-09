@@ -18,3 +18,9 @@ body {
 h1, h2, h3, h4, h5, h6, .font-serif {
   font-family: var(--font-serif);
 }
+
+@media print {
+  .hide-on-print {
+    display: none !important;
+  }
+}
