@@ -2,9 +2,20 @@ const prisma = require("../config/prisma");
 
 const createPurchaseOrder = async (req, res, next) => {
     try {
-        const { poNumber, supplier, amount, status, items } = req.body;
-        if (!poNumber || !supplier || amount === undefined) {
-            return res.status(400).json({ success: false, message: "Missing required fields" });
+        // Map frontend fields (supplierName, totalAmount) to backend schema (supplier, amount)
+        const supplier = req.body.supplier || req.body.supplierName;
+        const amount = req.body.amount !== undefined ? req.body.amount : req.body.totalAmount;
+        const { status, items } = req.body;
+        
+        let poNumber = req.body.poNumber;
+
+        if (!supplier || amount === undefined) {
+            return res.status(400).json({ success: false, message: "Missing required fields: supplier and amount are required." });
+        }
+
+        if (!poNumber) {
+            // Generate a PO number automatically if not provided
+            poNumber = `PO-${Date.now()}`;
         }
 
         const newPO = await prisma.purchaseOrder.create({
