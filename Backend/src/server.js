@@ -19,13 +19,26 @@ const { errorHandler } = require("./middleware/errorMiddleware");
 
 const app = express();
 
-
+const allowedOrigins = [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://mini-69671083p-kunal-kumars-projects-c3b97c3f.vercel.app",
+    "https://mini-erp-git-main-kunal-kumars-projects-c3b97c3f.vercel.app",
+    "https://mini-erp-gilt-sigma.vercel.app",
+    ...(process.env.FRONTEND_URL || "")
+        .split(",")
+        .map((origin) => origin.trim())
+        .filter(Boolean)
+];
 
 app.use(
     cors({
         origin: function (origin, callback) {
-            // Allow all origins by reflecting the request origin
-            callback(null, origin || true);
+            if (!origin || allowedOrigins.includes(origin)) {
+                return callback(null, true);
+            }
+
+            return callback(new Error("Not allowed by CORS"));
         },
         credentials: true
     })
@@ -33,6 +46,11 @@ app.use(
 
 app.use(express.json());
 app.use(cookieParser());
+
+// Root route for browser checks
+app.get("/", (req, res) => {
+    res.send("Mini ERP Backend Server is running! 🚀");
+});
 
 app.get("/api/health", (req, res) => {
     res.json({
