@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import API from '../api/axios';
 import { Layers, Search, Filter, Plus, Edit2 } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
 import Modal from '../components/Modal';
@@ -32,7 +32,7 @@ const Inventory = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/products?limit=100', { withCredentials: true });
+      const response = await API.get('/api/products?limit=100');
       if (response.data.success) {
         setProducts(response.data.data);
       }
@@ -67,11 +67,11 @@ const Inventory = () => {
     if (!canManage) return;
     try {
       const endpoint = formData.movementType === 'IN' ? '/api/stock/in' : '/api/stock/out';
-      await axios.post(`http://localhost:5000${endpoint}`, {
+      await API.post(endpoint, {
         productId: Number(formData.productId),
         quantity: Number(formData.quantity),
         reason: formData.reason
-      }, { withCredentials: true });
+      });
       
       setIsModalOpen(false);
       fetchProducts();

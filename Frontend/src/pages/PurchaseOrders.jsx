@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import API from '../api/axios';
 import { Plus, Search, Filter, Download, Eye, MoreVertical, Edit2, Trash2 } from 'lucide-react';
 import Modal from '../components/Modal';
 
@@ -30,7 +30,7 @@ const PurchaseOrders = () => {
 
   const fetchPurchaseOrders = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/purchase-orders', { withCredentials: true });
+      const response = await API.get('/api/purchase-orders');
       if (response.data.success) {
         setPurchaseOrders(response.data.data);
       }
@@ -60,10 +60,10 @@ const PurchaseOrders = () => {
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/purchase-orders', {
+      await API.post('/api/purchase-orders', {
         ...formData,
         totalAmount: Number(formData.totalAmount)
-      }, { withCredentials: true });
+      });
       setIsCreateModalOpen(false);
       fetchPurchaseOrders();
     } catch (err) {
@@ -74,7 +74,7 @@ const PurchaseOrders = () => {
   const handleStatusSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:5000/api/purchase-orders/${currentPO.id}/status`, { status: newStatus }, { withCredentials: true });
+      await API.put(`/api/purchase-orders/${currentPO.id}/status`, { status: newStatus });
       setIsStatusModalOpen(false);
       fetchPurchaseOrders();
     } catch (err) {
@@ -85,7 +85,7 @@ const PurchaseOrders = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this purchase order?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/purchase-orders/${id}`, { withCredentials: true });
+        await API.delete(`/api/purchase-orders/${id}`);
         fetchPurchaseOrders();
       } catch (err) {
         alert(err.response?.data?.message || 'Failed to delete PO');

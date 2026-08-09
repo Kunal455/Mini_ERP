@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import API from '../api/axios';
 import { FileText, Plus, Search, Filter, Download, MoreVertical, Eye, Printer, Edit2, Trash2 } from 'lucide-react';
 import { Link, useOutletContext } from 'react-router-dom';
 import Modal from '../components/Modal';
@@ -23,7 +23,7 @@ const SalesChallans = () => {
 
   const fetchChallans = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/challans?limit=100', { withCredentials: true });
+      const response = await API.get('/api/challans?limit=100');
       if (response.data.success) {
         setChallans(response.data.data);
       }
@@ -45,7 +45,7 @@ const SalesChallans = () => {
     e.preventDefault();
     if (!canManage) return;
     try {
-      await axios.patch(`http://localhost:5000/api/challans/${currentChallan.id}/status`, { status: newStatus }, { withCredentials: true });
+      await API.patch(`/api/challans/${currentChallan.id}/status`, { status: newStatus });
       setIsModalOpen(false);
       fetchChallans();
     } catch (err) {
@@ -57,7 +57,7 @@ const SalesChallans = () => {
     if (!canManage) return;
     if (window.confirm("Are you sure you want to delete this challan?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/challans/${id}`, { withCredentials: true });
+        await API.delete(`/api/challans/${id}`);
         fetchChallans();
       } catch (err) {
         alert(err.response?.data?.message || 'Failed to delete challan');

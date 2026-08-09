@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import API from '../api/axios';
 import { Users, FileText, Package, ArrowUpRight, PackageOpen, CalendarClock, AlertCircle } from 'lucide-react';
 import { Link, useOutletContext } from 'react-router-dom';
 
@@ -11,7 +11,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/admin/dashboard', {
+        const response = await API.get('/api/admin/dashboard', {
           withCredentials: true
         });
         if (response.data.success) {

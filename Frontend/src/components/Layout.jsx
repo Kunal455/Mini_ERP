@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Users, Box, Layers, FileText, Settings, Search, Moon, Bell, ShoppingCart, Receipt, CalendarClock, BarChart2, User, LogOut } from 'lucide-react';
-import axios from 'axios';
+import API from './api/axios';
 import Modal from './Modal';
 
 const permissions = {
@@ -42,7 +42,7 @@ const Layout = () => {
 
   const fetchUser = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/auth/me', { withCredentials: true });
+      const response = await API.get('/api/auth/me');
       if (response.data.success) {
         setUser(response.data.data);
       }
@@ -73,7 +73,7 @@ const Layout = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post('http://localhost:5000/api/auth/logout', {}, { withCredentials: true });
+      await API.post('/api/auth/logout', {});
       navigate('/login');
     } catch (err) {
       console.error('Logout failed:', err);
@@ -91,7 +91,7 @@ const Layout = () => {
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.put('http://localhost:5000/api/auth/me', { name: editName }, { withCredentials: true });
+      const response = await API.put('/api/auth/me', { name: editName });
       if (response.data.success) {
         setUser(response.data.data);
         setIsEditProfileModalOpen(false);

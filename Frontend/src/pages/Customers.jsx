@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import API from '../api/axios';
 import { Users, Filter, Download, Plus, Search, Eye, Edit2, ShieldAlert, Trash2 } from 'lucide-react';
 import { Link, useOutletContext } from 'react-router-dom';
 import Modal from '../components/Modal';
@@ -37,7 +37,7 @@ const Customers = () => {
 
   const fetchCustomers = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/customers', { withCredentials: true });
+      const response = await API.get('/api/customers');
       if (response.data.success) {
         setCustomers(response.data.data);
       }
@@ -85,9 +85,9 @@ const Customers = () => {
     if (!canManage) return;
     try {
       if (modalMode === 'create') {
-        await axios.post('http://localhost:5000/api/customers', formData, { withCredentials: true });
+        await API.post('/api/customers', formData);
       } else {
-        await axios.put(`http://localhost:5000/api/customers/${currentCustomer.id}`, formData, { withCredentials: true });
+        await API.put(`/api/customers/${currentCustomer.id}`, formData);
       }
       setIsModalOpen(false);
       fetchCustomers();
@@ -100,7 +100,7 @@ const Customers = () => {
     if (!canManage) return;
     if (window.confirm("Are you sure you want to delete this customer?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/customers/${id}`, { withCredentials: true });
+        await API.delete(`/api/customers/${id}`);
         fetchCustomers();
       } catch (err) {
         alert(err.response?.data?.message || 'Failed to delete customer');
@@ -112,7 +112,7 @@ const Customers = () => {
     if (!canManage) return;
     try {
       const newStatus = customer.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
-      await axios.put(`http://localhost:5000/api/customers/${customer.id}`, { status: newStatus }, { withCredentials: true });
+      await API.put(`/api/customers/${customer.id}`, { status: newStatus });
       fetchCustomers();
     } catch (err) {
       alert('Failed to update status');

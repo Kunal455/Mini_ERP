@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import API from '../api/axios';
 import { Shield, ShieldAlert, Edit2, Power, UserPlus, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Modal from '../components/Modal';
@@ -24,7 +24,7 @@ const Users = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/users', { withCredentials: true });
+      const response = await API.get('/api/users');
       if (response.data.success) {
         setUsers(response.data.data);
       }
@@ -37,9 +37,9 @@ const Users = () => {
 
   const handleToggleActive = async (id, currentStatus) => {
     try {
-      await axios.patch(`http://localhost:5000/api/users/${id}/status`, {
+      await API.patch(`/api/users/${id}/status`, {
         isActive: !currentStatus
-      }, { withCredentials: true });
+      });
       fetchUsers();
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to update user status');
@@ -64,7 +64,7 @@ const Users = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:5000/api/users/${currentEditUser.id}`, editFormData, { withCredentials: true });
+      await API.put(`/api/users/${currentEditUser.id}`, editFormData);
       setIsEditModalOpen(false);
       fetchUsers();
     } catch (err) {

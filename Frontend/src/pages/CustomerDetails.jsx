@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import API from '../api/axios';
 import { ArrowLeft, Edit2, ShieldAlert, Phone, Mail, MapPin, Building, Package, CalendarClock } from 'lucide-react';
 
 const CustomerDetails = () => {
@@ -16,7 +16,7 @@ const CustomerDetails = () => {
 
   const fetchCustomerDetails = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/customers/${id}`, { withCredentials: true });
+      const response = await API.get(`/api/customers/${id}`);
       if (response.data.success) {
         setCustomer(response.data.data);
       }

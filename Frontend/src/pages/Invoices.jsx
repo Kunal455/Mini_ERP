@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import API from '../api/axios';
 import { Plus, Search, Filter, Download, Eye, MoreVertical, Edit2, Trash2, Printer } from 'lucide-react';
 import { Link, useOutletContext } from 'react-router-dom';
 import Modal from '../components/Modal';
@@ -35,8 +35,8 @@ const Invoices = () => {
   const fetchData = async () => {
     try {
       const [invRes, custRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/invoices', { withCredentials: true }),
-        axios.get('http://localhost:5000/api/customers', { withCredentials: true })
+        API.get('/api/invoices'),
+        API.get('/api/customers')
       ]);
       if (invRes.data.success) setInvoices(invRes.data.data);
       if (custRes.data.success) setCustomers(custRes.data.data);
@@ -69,10 +69,10 @@ const Invoices = () => {
     e.preventDefault();
     if (!canManage) return;
     try {
-      await axios.post('http://localhost:5000/api/invoices', {
+      await API.post('/api/invoices', {
         customerId: Number(formData.customerId),
         amount: Number(formData.amount)
-      }, { withCredentials: true });
+      });
       setIsCreateModalOpen(false);
       fetchData();
     } catch (err) {
@@ -84,7 +84,7 @@ const Invoices = () => {
     e.preventDefault();
     if (!canManage) return;
     try {
-      await axios.put(`http://localhost:5000/api/invoices/${currentInvoice.id}`, { status: newStatus }, { withCredentials: true });
+      await API.put(`/api/invoices/${currentInvoice.id}`, { status: newStatus });
       setIsStatusModalOpen(false);
       fetchData();
     } catch (err) {
@@ -96,7 +96,7 @@ const Invoices = () => {
     if (!canManage) return;
     if (window.confirm("Are you sure you want to delete this invoice?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/invoices/${id}`, { withCredentials: true });
+        await API.delete(`/api/invoices/${id}`);
         fetchData();
       } catch (err) {
         alert(err.response?.data?.message || 'Failed to delete Invoice');

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import API from '../api/axios';
 import { CalendarClock, Plus, Search, Filter, CheckCircle2, Clock, Check, MoreVertical, Trash2 } from 'lucide-react';
 import Modal from '../components/Modal';
 
@@ -30,8 +30,8 @@ const FollowUps = () => {
   const fetchData = async () => {
     try {
       const [followRes, custRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/follow-ups', { withCredentials: true }),
-        axios.get('http://localhost:5000/api/customers', { withCredentials: true })
+        API.get('/api/follow-ups'),
+        API.get('/api/customers')
       ]);
       if (followRes.data.success) setFollowUps(followRes.data.data);
       if (custRes.data.success) setCustomers(custRes.data.data);
@@ -55,10 +55,10 @@ const FollowUps = () => {
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`http://localhost:5000/api/customers/${formData.customerId}/followups`, {
+      await API.post(`/api/customers/${formData.customerId}/followups`, {
         ...formData,
         customerId: Number(formData.customerId)
-      }, { withCredentials: true });
+      });
       setIsCreateModalOpen(false);
       fetchData();
     } catch (err) {
@@ -69,7 +69,7 @@ const FollowUps = () => {
   const handleComplete = async (id) => {
     if (window.confirm("Mark this follow-up as done? It will be removed.")) {
       try {
-        await axios.delete(`http://localhost:5000/api/follow-ups/${id}`, { withCredentials: true });
+        await API.delete(`/api/follow-ups/${id}`);
         fetchData();
       } catch (err) {
         alert(err.response?.data?.message || 'Failed to complete follow-up');

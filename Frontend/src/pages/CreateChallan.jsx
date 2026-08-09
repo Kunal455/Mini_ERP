@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import API from '../api/axios';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Trash2, ArrowLeft } from 'lucide-react';
 
@@ -21,8 +21,8 @@ const CreateChallan = () => {
   const fetchData = async () => {
     try {
       const [customersRes, productsRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/customers', { withCredentials: true }),
-        axios.get('http://localhost:5000/api/products?limit=100', { withCredentials: true })
+        API.get('/api/customers'),
+        API.get('/api/products?limit=100')
       ]);
       if (customersRes.data.success) setCustomers(customersRes.data.data);
       if (productsRes.data.success) setProducts(productsRes.data.data);
@@ -76,7 +76,7 @@ const CreateChallan = () => {
           unitPrice: i.unitPrice
         }))
       };
-      const response = await axios.post('http://localhost:5000/api/challans', payload, { withCredentials: true });
+      const response = await API.post('/api/challans', payload);
       if (response.data.success) {
         navigate('/challans');
       }

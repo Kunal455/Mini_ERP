@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import API from '../api/axios';
 import { Package, Plus, Search, Filter, Download, Edit2, Eye, Trash2 } from 'lucide-react';
 import { Link, useOutletContext } from 'react-router-dom';
 import Modal from '../components/Modal';
@@ -35,7 +35,7 @@ const Products = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/products?limit=100', { withCredentials: true });
+      const response = await API.get('/api/products?limit=100');
       if (response.data.success) {
         setProducts(response.data.data);
       }
@@ -87,9 +87,9 @@ const Products = () => {
       
       if (modalMode === 'create') {
         payload.currentStock = 0; // Default to 0 when creating a product
-        await axios.post('http://localhost:5000/api/products', payload, { withCredentials: true });
+        await API.post('/api/products', payload);
       } else {
-        await axios.put(`http://localhost:5000/api/products/${currentProduct.id}`, payload, { withCredentials: true });
+        await API.put(`/api/products/${currentProduct.id}`, payload);
       }
       setIsModalOpen(false);
       fetchProducts();
@@ -102,7 +102,7 @@ const Products = () => {
     if (!canManage) return;
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/products/${id}`, { withCredentials: true });
+        await API.delete(`/api/products/${id}`);
         fetchProducts();
       } catch (err) {
         alert(err.response?.data?.message || 'Failed to delete product');

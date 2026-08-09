@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Link, useNavigate, useOutletContext } from 'react-router-dom';
-import axios from 'axios';
+import API from '../api/axios';
 import { ArrowLeft, Edit2, Printer, Download } from 'lucide-react';
 import Modal from '../components/Modal';
 
@@ -22,7 +22,7 @@ const ChallanDetails = () => {
 
   const fetchChallanDetails = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/challans/${id}`, { withCredentials: true });
+      const response = await API.get(`/api/challans/${id}`);
       if (response.data.success) {
         setChallan(response.data.data);
       }
@@ -55,7 +55,7 @@ const ChallanDetails = () => {
     if (!canManage) return;
     try {
       const endpoint = action === 'CONFIRMED' ? 'confirm' : 'cancel';
-      await axios.patch(`http://localhost:5000/api/challans/${id}/${endpoint}`, {}, { withCredentials: true });
+      await API.patch(`/api/challans/${id}/${endpoint}`, {});
       setIsModalOpen(false);
       fetchChallanDetails();
     } catch (err) {

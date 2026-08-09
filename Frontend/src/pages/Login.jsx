@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import API from '../api/axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Star, Users, FileText, BarChart3, ShieldCheck, Zap } from 'lucide-react';
 
@@ -26,7 +26,7 @@ const Login = () => {
     setLoading(true);
     
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await API.post('/api/auth/login', {
         email: formData.email,
         password: formData.password
       }, {
