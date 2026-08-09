@@ -25,7 +25,13 @@ const seedAdmin = async () => {
             });
             console.log(`Default admin created with email: ${adminEmail}`);
         } else {
-            console.log("Admin user already exists. Skipping seed.");
+            console.log("Admin user already exists. Updating password to ensure access...");
+            const hashedPassword = await bcrypt.hash(adminPassword, 10);
+            await prisma.user.update({
+                where: { email: adminEmail },
+                data: { password: hashedPassword }
+            });
+            console.log(`Default admin password updated for email: ${adminEmail}`);
         }
     } catch (error) {
         console.error("Error seeding admin user:", error);
