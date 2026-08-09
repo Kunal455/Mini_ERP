@@ -102,4 +102,4 @@ The application is deployed using modern cloud platforms:
 ---
 
 ## 📝 API Documentation
-A Postman collection (`FundsERP_Postman_Collection.json`) is included in the root of this repository. Import it into Postman to view and test all available endpoints, request bodies, and expected responses.
+A Postman collection (https://kk6547015-4843383.postman.co/workspace/kunal's-Workspace~c0e1ca57-4a75-4ba8-80ea-130865150004/request/46950697-ec3a662f-b32a-4ec8-8a32-abd7c4137759?action=share&creator=46950697) is included in the root of this repository. Import it into Postman to view and test all available endpoints, request bodies, and expected responses.
