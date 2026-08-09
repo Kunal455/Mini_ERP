@@ -94,18 +94,20 @@ const Users = () => {
                     )}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-3">
-                      <button className="text-slate-400 hover:text-indigo-600 transition-colors" title="Edit User">
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button 
-                        onClick={() => handleToggleActive(user.id, user.isActive)}
-                        className={`transition-colors ${user.isActive ? 'text-slate-400 hover:text-red-600' : 'text-slate-400 hover:text-emerald-600'}`} 
-                        title={user.isActive ? "Deactivate User" : "Activate User"}
-                      >
-                        <Power className="w-4 h-4" />
-                      </button>
-                    </div>
+                    {user.role !== 'ADMIN' && (
+                      <div className="flex items-center justify-end gap-3">
+                        <button className="text-slate-400 hover:text-indigo-600 transition-colors" title="Edit User">
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => handleToggleActive(user.id, user.isActive)}
+                          className={`transition-colors ${user.isActive ? 'text-slate-400 hover:text-red-600' : 'text-slate-400 hover:text-emerald-600'}`} 
+                          title={user.isActive ? "Deactivate User" : "Activate User"}
+                        >
+                          <Power className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
