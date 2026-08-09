@@ -18,6 +18,15 @@ const Users = () => {
     role: ''
   });
 
+  // Create Modal State
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [createFormData, setCreateFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: 'SALES'
+  });
+
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -72,6 +81,23 @@ const Users = () => {
     }
   };
 
+  const handleCreateFormChange = (e) => {
+    const { name, value } = e.target;
+    setCreateFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCreateSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await API.post('/api/users', createFormData);
+      setIsCreateModalOpen(false);
+      fetchUsers();
+      setCreateFormData({ name: '', email: '', password: '', role: 'SALES' });
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to create user');
+    }
+  };
+
   if (loading) return <div className="p-8 text-slate-500">Loading users...</div>;
   if (error) return <div className="p-8 text-red-500">Error: {error}</div>;
 
@@ -84,9 +110,9 @@ const Users = () => {
           <h2 className="text-2xl font-bold text-slate-900 mb-1">Manage Users</h2>
           <p className="text-sm text-slate-500">View and manage employee access across the CRM</p>
         </div>
-        <Link to="/signup" className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
+        <button onClick={() => setIsCreateModalOpen(true)} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
           <UserPlus className="w-4 h-4" /> Add New User
-        </Link>
+        </button>
       </div>
 
       {/* Main Table Area */}
@@ -160,6 +186,37 @@ const Users = () => {
           </table>
         </div>
       </div>
+
+      {/* Create User Modal */}
+      <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} title="Create New User">
+        <form onSubmit={handleCreateSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Name</label>
+            <input required type="text" name="name" value={createFormData.name} onChange={handleCreateFormChange} className="w-full p-2 border border-slate-200 rounded-lg text-sm" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+            <input required type="email" name="email" value={createFormData.email} onChange={handleCreateFormChange} className="w-full p-2 border border-slate-200 rounded-lg text-sm" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
+            <input required type="text" name="password" minLength={8} value={createFormData.password} onChange={handleCreateFormChange} className="w-full p-2 border border-slate-200 rounded-lg text-sm" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Role</label>
+            <select required name="role" value={createFormData.role} onChange={handleCreateFormChange} className="w-full p-2 border border-slate-200 rounded-lg text-sm">
+              <option value="ADMIN">ADMIN</option>
+              <option value="SALES">SALES</option>
+              <option value="WAREHOUSE">WAREHOUSE</option>
+              <option value="ACCOUNTS">ACCOUNTS</option>
+            </select>
+          </div>
+          <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-6">
+            <button type="button" onClick={() => setIsCreateModalOpen(false)} className="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors">Cancel</button>
+            <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors shadow-sm">Create User</button>
+          </div>
+        </form>
+      </Modal>
 
       {/* Edit User Modal */}
       <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="Edit User">
