@@ -2,11 +2,21 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Shield, ShieldAlert, Edit2, Power, UserPlus, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import Modal from '../components/Modal';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // Edit Modal State
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [currentEditUser, setCurrentEditUser] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    name: '',
+    email: '',
+    role: ''
+  });
 
   useEffect(() => {
     fetchUsers();
@@ -14,8 +24,6 @@ const Users = () => {
 
   const fetchUsers = async () => {
     try {
-      // In a real app, we'd have a GET /api/users endpoint. Let's assume it exists or use admin dashboard for now.
-      // Since we didn't explicitly check if GET /api/users is unprotected/returns array, let's call it.
       const response = await axios.get('http://localhost:5000/api/users', { withCredentials: true });
       if (response.data.success) {
         setUsers(response.data.data);
@@ -28,8 +36,40 @@ const Users = () => {
   };
 
   const handleToggleActive = async (id, currentStatus) => {
-    // Placeholder for actual toggle functionality
-    alert(`Toggle active status for user ${id}. Currently: ${currentStatus}`);
+    try {
+      await axios.patch(`http://localhost:5000/api/users/${id}/status`, {
+        isActive: !currentStatus
+      }, { withCredentials: true });
+      fetchUsers();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update user status');
+    }
+  };
+
+  const handleOpenEditModal = (user) => {
+    setCurrentEditUser(user);
+    setEditFormData({
+      name: user.name,
+      email: user.email,
+      role: user.role
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditFormChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put(`http://localhost:5000/api/users/${currentEditUser.id}`, editFormData, { withCredentials: true });
+      setIsEditModalOpen(false);
+      fetchUsers();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update user');
+    }
   };
 
   if (loading) return <div className="p-8 text-slate-500">Loading users...</div>;
@@ -96,7 +136,7 @@ const Users = () => {
                   <td className="px-6 py-4 text-right">
                     {user.role !== 'ADMIN' && (
                       <div className="flex items-center justify-end gap-3">
-                        <button className="text-slate-400 hover:text-indigo-600 transition-colors" title="Edit User">
+                        <button onClick={() => handleOpenEditModal(user)} className="text-slate-400 hover:text-indigo-600 transition-colors" title="Edit User">
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button 
@@ -120,6 +160,33 @@ const Users = () => {
           </table>
         </div>
       </div>
+
+      {/* Edit User Modal */}
+      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="Edit User">
+        <form onSubmit={handleEditSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Name</label>
+            <input required type="text" name="name" value={editFormData.name} onChange={handleEditFormChange} className="w-full p-2 border border-slate-200 rounded-lg text-sm" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+            <input required type="email" name="email" value={editFormData.email} onChange={handleEditFormChange} className="w-full p-2 border border-slate-200 rounded-lg text-sm" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Role</label>
+            <select required name="role" value={editFormData.role} onChange={handleEditFormChange} className="w-full p-2 border border-slate-200 rounded-lg text-sm">
+              <option value="ADMIN">ADMIN</option>
+              <option value="SALES">SALES</option>
+              <option value="WAREHOUSE">WAREHOUSE</option>
+              <option value="ACCOUNTS">ACCOUNTS</option>
+            </select>
+          </div>
+          <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-6">
+            <button type="button" onClick={() => setIsEditModalOpen(false)} className="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors">Cancel</button>
+            <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors shadow-sm">Save Changes</button>
+          </div>
+        </form>
+      </Modal>
 
     </div>
   );
