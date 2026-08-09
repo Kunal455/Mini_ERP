@@ -2,9 +2,14 @@ const prisma = require("../config/prisma");
 
 const createInvoice = async (req, res, next) => {
     try {
-        const { invoiceNumber, customerId, amount, status, items } = req.body;
-        if (!invoiceNumber || !customerId || amount === undefined) {
-            return res.status(400).json({ success: false, message: "Missing required fields" });
+        let { invoiceNumber, customerId, amount, status, items } = req.body;
+        
+        if (!invoiceNumber) {
+            invoiceNumber = `INV-${Date.now()}`;
+        }
+
+        if (!customerId || amount === undefined) {
+            return res.status(400).json({ success: false, message: "Missing required fields: customerId and amount are required." });
         }
 
         const newInvoice = await prisma.invoice.create({
