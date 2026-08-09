@@ -121,11 +121,14 @@ const Login = () => {
             
           </form>
 
-          <p className="mt-8 text-xs text-slate-500 text-center leading-relaxed">
-            By signing in you agree to our <a href="#" className="text-indigo-600 hover:underline">Terms of Service</a> and <a href="#" className="text-indigo-600 hover:underline">Privacy Policy</a>.
-          </p>
+          <p className="mt-8 text-center text-sm text-slate-600">
+          By signing in you agree to our <a href="#" className="text-indigo-600 hover:underline">Terms of Service</a> and <a href="#" className="text-indigo-600 hover:underline">Privacy Policy</a>.
+        </p>
 
-        </div>
+        <p className="mt-4 text-center text-sm text-slate-600">
+          Don't have an account? <Link to="/signup" className="text-indigo-600 hover:text-indigo-700 font-semibold">Create one free</Link>
+        </p>
+      </div>
       </div>
       
       {/* RIGHT PANEL (INFO) */}

@@ -8,7 +8,38 @@ const authCookieOptions = {
     sameSite: "none" // Required for Vercel -> Render communication
 };
 
+const signup = async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
 
+        if (!name || !email || !password) {
+            return res.status(400).json({ success: false, message: "All fields are required" });
+        }
+
+        const existingUser = await prisma.user.findUnique({ where: { email } });
+        if (existingUser) {
+            return res.status(400).json({ success: false, message: "Email already in use" });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        
+        // Always assign SALES role for public signup
+        const newUser = await prisma.user.create({
+            data: {
+                name,
+                email,
+                password: hashedPassword,
+                role: "SALES", 
+                isActive: true
+            }
+        });
+
+        res.status(201).json({ success: true, message: "User created successfully", user: newUser });
+    } catch (error) {
+        console.error("Signup error:", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+};
 
 const login = async (req, res) => {
     try {
@@ -99,6 +130,7 @@ const updateMe = async (req, res) => {
 };
 
 module.exports = {
+    signup,
     login,
     logout,
     getMe,
