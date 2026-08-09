@@ -49,7 +49,7 @@ app.use(cookieParser());
 
 // Root route for browser checks
 app.get("/", (req, res) => {
-    res.send("Mini ERP Backend Server is running! 🚀");
+    res.send("FundsERP Backend Server is running! 🚀");
 });
 
 app.get("/api/health", (req, res) => {

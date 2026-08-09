@@ -140,7 +140,7 @@ const Login = () => {
           <div className="flex items-center gap-3 mb-8">
             <div className="flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 backdrop-blur-sm">
               <Zap className="w-4 h-4" />
-              <span className="font-semibold text-sm">FundsRoom <span className="bg-white/20 text-xs px-1.5 py-0.5 rounded ml-1">AI</span></span>
+              <span className="font-semibold text-sm">FundsERP <span className="bg-white/20 text-xs px-1.5 py-0.5 rounded ml-1">AI</span></span>
             </div>
             <div className="bg-white/10 border border-white/20 rounded-full px-4 py-1.5 backdrop-blur-sm text-sm">
               ✨ AI-Native Operations CRM
