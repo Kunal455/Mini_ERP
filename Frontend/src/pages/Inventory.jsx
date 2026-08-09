@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Layers, Search, Filter, Plus, Edit2 } from 'lucide-react';
+import { useOutletContext } from 'react-router-dom';
 import Modal from '../components/Modal';
 
 const Inventory = () => {
+  const { user } = useOutletContext();
+  const canManage = user?.role === 'ADMIN' || user?.role === 'WAREHOUSE';
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -37,6 +41,7 @@ const Inventory = () => {
   };
 
   const handleOpenModal = (product = null) => {
+    if (!canManage) return;
     setCurrentProduct(product);
     setFormData({
       productId: product ? product.id : (products.length > 0 ? products[0].id : ''),
@@ -56,6 +61,7 @@ const Inventory = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+    if (!canManage) return;
     try {
       const endpoint = formData.movementType === 'IN' ? '/api/stock/in' : '/api/stock/out';
       await axios.post(`http://localhost:5000${endpoint}`, {
@@ -87,9 +93,11 @@ const Inventory = () => {
           <h2 className="text-2xl font-bold text-slate-900 mb-1">Inventory</h2>
           <p className="text-sm text-slate-500">Monitor and adjust your physical stock levels</p>
         </div>
-        <button onClick={() => handleOpenModal()} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
-          <Plus className="w-4 h-4" /> Stock Adjustment
-        </button>
+        {canManage && (
+          <button onClick={() => handleOpenModal()} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
+            <Plus className="w-4 h-4" /> Stock Adjustment
+          </button>
+        )}
       </div>
 
       {/* Summary Cards */}
@@ -145,7 +153,7 @@ const Inventory = () => {
                 <th className="px-6 py-4 text-center">Current Stock</th>
                 <th className="px-6 py-4 text-center">Min Stock</th>
                 <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4 text-right">Actions</th>
+                {canManage && <th className="px-6 py-4 text-right">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -174,19 +182,21 @@ const Inventory = () => {
                         {status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => handleOpenModal(product)} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-indigo-600 hover:bg-indigo-50 rounded-md border border-indigo-100 transition-colors">
-                          <Edit2 className="w-3 h-3" /> Adjust
-                        </button>
-                      </div>
-                    </td>
+                    {canManage && (
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button onClick={() => handleOpenModal(product)} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-indigo-600 hover:bg-indigo-50 rounded-md border border-indigo-100 transition-colors">
+                            <Edit2 className="w-3 h-3" /> Adjust
+                          </button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 );
               })}
               {products.length === 0 && (
                 <tr>
-                  <td colSpan="6" className="px-6 py-8 text-center text-slate-500">No inventory found.</td>
+                  <td colSpan={canManage ? 6 : 5} className="px-6 py-8 text-center text-slate-500">No inventory found.</td>
                 </tr>
               )}
             </tbody>

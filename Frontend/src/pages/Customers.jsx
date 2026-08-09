@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Users, Filter, Download, Plus, Search, MoreVertical, Eye, Edit2, ShieldAlert, Trash2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Users, Filter, Download, Plus, Search, Eye, Edit2, ShieldAlert, Trash2 } from 'lucide-react';
+import { Link, useOutletContext } from 'react-router-dom';
 import Modal from '../components/Modal';
 
 const Customers = () => {
+  const { user } = useOutletContext();
+  const canManage = user?.role === 'ADMIN' || user?.role === 'SALES';
+
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -43,6 +46,7 @@ const Customers = () => {
   };
 
   const handleOpenModal = (mode, customer = null) => {
+    if (!canManage) return;
     setModalMode(mode);
     if (mode === 'edit' && customer) {
       setCurrentCustomer(customer);
@@ -75,6 +79,7 @@ const Customers = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+    if (!canManage) return;
     try {
       if (modalMode === 'create') {
         await axios.post('http://localhost:5000/api/customers', formData, { withCredentials: true });
@@ -89,6 +94,7 @@ const Customers = () => {
   };
 
   const handleDelete = async (id) => {
+    if (!canManage) return;
     if (window.confirm("Are you sure you want to delete this customer?")) {
       try {
         await axios.delete(`http://localhost:5000/api/customers/${id}`, { withCredentials: true });
@@ -100,6 +106,7 @@ const Customers = () => {
   };
 
   const handleStatusToggle = async (customer) => {
+    if (!canManage) return;
     try {
       const newStatus = customer.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
       await axios.put(`http://localhost:5000/api/customers/${customer.id}`, { status: newStatus }, { withCredentials: true });
@@ -125,9 +132,11 @@ const Customers = () => {
           <h2 className="text-2xl font-bold text-slate-900 mb-1">Customers</h2>
           <p className="text-sm text-slate-500">Manage your customers and their information</p>
         </div>
-        <button onClick={() => handleOpenModal('create')} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
-          <Plus className="w-4 h-4" /> Add Customer
-        </button>
+        {canManage && (
+          <button onClick={() => handleOpenModal('create')} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
+            <Plus className="w-4 h-4" /> Add Customer
+          </button>
+        )}
       </div>
 
       {/* Summary Cards */}
@@ -205,15 +214,21 @@ const Customers = () => {
                       <Link to={`/customers/${customer.id}`} className="p-1.5 text-slate-400 hover:text-indigo-600 rounded-md hover:bg-indigo-50" title="View">
                         <Eye className="w-4 h-4" />
                       </Link>
-                      <button onClick={() => handleOpenModal('edit', customer)} className="p-1.5 text-slate-400 hover:text-blue-600 rounded-md hover:bg-blue-50" title="Edit">
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button onClick={() => handleStatusToggle(customer)} className="p-1.5 text-slate-400 hover:text-amber-600 rounded-md hover:bg-amber-50" title="Toggle Status">
-                        <ShieldAlert className="w-4 h-4" />
-                      </button>
-                      <button onClick={() => handleDelete(customer.id)} className="p-1.5 text-slate-400 hover:text-rose-600 rounded-md hover:bg-rose-50" title="Delete">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      {canManage && (
+                        <>
+                          <button onClick={() => handleOpenModal('edit', customer)} className="p-1.5 text-slate-400 hover:text-blue-600 rounded-md hover:bg-blue-50" title="Edit">
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => handleStatusToggle(customer)} className="p-1.5 text-slate-400 hover:text-amber-600 rounded-md hover:bg-amber-50" title="Toggle Status">
+                            <ShieldAlert className="w-4 h-4" />
+                          </button>
+                          {user?.role === 'ADMIN' && (
+                            <button onClick={() => handleDelete(customer.id)} className="p-1.5 text-slate-400 hover:text-rose-600 rounded-md hover:bg-rose-50" title="Delete">
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>

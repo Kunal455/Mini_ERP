@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { FileText, Plus, Search, Filter, Download, MoreVertical, Eye, Printer, Edit2, Trash2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import Modal from '../components/Modal';
 
 const SalesChallans = () => {
+  const { user } = useOutletContext();
+  const canManage = user?.role === 'ADMIN' || user?.role === 'SALES';
+
   const [challans, setChallans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -32,6 +35,7 @@ const SalesChallans = () => {
   };
 
   const handleOpenStatusModal = (challan) => {
+    if (!canManage) return;
     setCurrentChallan(challan);
     setNewStatus(challan.status);
     setIsModalOpen(true);
@@ -39,6 +43,7 @@ const SalesChallans = () => {
 
   const handleStatusSubmit = async (e) => {
     e.preventDefault();
+    if (!canManage) return;
     try {
       await axios.patch(`http://localhost:5000/api/challans/${currentChallan.id}/status`, { status: newStatus }, { withCredentials: true });
       setIsModalOpen(false);
@@ -49,6 +54,7 @@ const SalesChallans = () => {
   };
 
   const handleDelete = async (id) => {
+    if (!canManage) return;
     if (window.confirm("Are you sure you want to delete this challan?")) {
       try {
         await axios.delete(`http://localhost:5000/api/challans/${id}`, { withCredentials: true });
@@ -75,9 +81,11 @@ const SalesChallans = () => {
           <h2 className="text-2xl font-bold text-slate-900 mb-1">Sales Challans</h2>
           <p className="text-sm text-slate-500">Manage all sales challans and deliveries</p>
         </div>
-        <Link to="/challans/create" className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
-          <Plus className="w-4 h-4" /> Create Challan
-        </Link>
+        {canManage && (
+          <Link to="/challans/create" className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
+            <Plus className="w-4 h-4" /> Create Challan
+          </Link>
+        )}
       </div>
 
       {/* Summary Cards */}
@@ -161,15 +169,19 @@ const SalesChallans = () => {
                         <Link to={`/challans/${challan.id}`} className="p-1.5 text-slate-400 hover:text-indigo-600 rounded-md hover:bg-indigo-50" title="View">
                           <Eye className="w-4 h-4" />
                         </Link>
-                        <button onClick={() => handleOpenStatusModal(challan)} className="p-1.5 text-slate-400 hover:text-blue-600 rounded-md hover:bg-blue-50" title="Update Status">
-                          <Edit2 className="w-4 h-4" />
-                        </button>
+                        {canManage && (
+                          <button onClick={() => handleOpenStatusModal(challan)} className="p-1.5 text-slate-400 hover:text-blue-600 rounded-md hover:bg-blue-50" title="Update Status">
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                        )}
                         <button onClick={() => window.print()} className="p-1.5 text-slate-400 hover:text-emerald-600 rounded-md hover:bg-emerald-50" title="Print">
                           <Printer className="w-4 h-4" />
                         </button>
-                        <button onClick={() => handleDelete(challan.id)} className="p-1.5 text-slate-400 hover:text-rose-600 rounded-md hover:bg-rose-50" title="Delete">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        {canManage && (
+                          <button onClick={() => handleDelete(challan.id)} className="p-1.5 text-slate-400 hover:text-rose-600 rounded-md hover:bg-rose-50" title="Delete">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

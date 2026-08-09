@@ -5,11 +5,14 @@ const { createInvoice, getInvoices, updateInvoice, deleteInvoice } = require("..
 
 const router = express.Router();
 
-router.use(authenticate, authorizeRoles("ADMIN", "SALES", "ACCOUNTS"));
+router.use(authenticate);
 
-router.get("/", getInvoices);
-router.post("/", createInvoice);
-router.put("/:id", updateInvoice);
-router.delete("/:id", deleteInvoice);
+// All roles that can access invoices can view them
+router.get("/", authorizeRoles("ADMIN", "SALES", "ACCOUNTS"), getInvoices);
+
+// Only ADMIN and ACCOUNTS can manage invoices
+router.post("/", authorizeRoles("ADMIN", "ACCOUNTS"), createInvoice);
+router.put("/:id", authorizeRoles("ADMIN", "ACCOUNTS"), updateInvoice);
+router.delete("/:id", authorizeRoles("ADMIN", "ACCOUNTS"), deleteInvoice);
 
 module.exports = router;

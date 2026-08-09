@@ -7,9 +7,9 @@ import Modal from './Modal';
 const permissions = {
   '/dashboard': ['ADMIN', 'SALES', 'WAREHOUSE', 'ACCOUNTS'],
   '/users': ['ADMIN'],
-  '/customers': ['ADMIN', 'SALES', 'ACCOUNTS'],
+  '/customers': ['ADMIN', 'SALES', 'WAREHOUSE', 'ACCOUNTS'],
   '/products': ['ADMIN', 'SALES', 'WAREHOUSE'],
-  '/inventory': ['ADMIN', 'WAREHOUSE'],
+  '/inventory': ['ADMIN', 'SALES', 'WAREHOUSE'],
   '/purchase-orders': ['ADMIN', 'WAREHOUSE'],
   '/challans': ['ADMIN', 'SALES', 'WAREHOUSE', 'ACCOUNTS'],
   '/invoices': ['ADMIN', 'SALES', 'ACCOUNTS'],
@@ -207,7 +207,7 @@ const Layout = () => {
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto">
           <div className="max-w-7xl mx-auto p-8">
-            <Outlet />
+            <Outlet context={{ user }} />
           </div>
         </div>
       </main>

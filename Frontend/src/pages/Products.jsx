@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Package, Plus, Search, Filter, Download, Edit2, Eye, Trash2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import Modal from '../components/Modal';
 
 const Products = () => {
+  const { user } = useOutletContext();
+  const canManage = user?.role === 'ADMIN' || user?.role === 'WAREHOUSE';
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -41,6 +44,7 @@ const Products = () => {
   };
 
   const handleOpenModal = (mode, product = null) => {
+    if (!canManage) return;
     setModalMode(mode);
     if (mode === 'edit' && product) {
       setCurrentProduct(product);
@@ -70,6 +74,7 @@ const Products = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+    if (!canManage) return;
     try {
       const payload = {
         ...formData,
@@ -78,6 +83,7 @@ const Products = () => {
       };
       
       if (modalMode === 'create') {
+        payload.currentStock = 0; // Default to 0 when creating a product
         await axios.post('http://localhost:5000/api/products', payload, { withCredentials: true });
       } else {
         await axios.put(`http://localhost:5000/api/products/${currentProduct.id}`, payload, { withCredentials: true });
@@ -90,6 +96,7 @@ const Products = () => {
   };
 
   const handleDelete = async (id) => {
+    if (!canManage) return;
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
         await axios.delete(`http://localhost:5000/api/products/${id}`, { withCredentials: true });
@@ -116,9 +123,11 @@ const Products = () => {
           <h2 className="text-2xl font-bold text-slate-900 mb-1">Products</h2>
           <p className="text-sm text-slate-500">Manage products, pricing and stock levels</p>
         </div>
-        <button onClick={() => handleOpenModal('create')} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
-          <Plus className="w-4 h-4" /> Add Product
-        </button>
+        {canManage && (
+          <button onClick={() => handleOpenModal('create')} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
+            <Plus className="w-4 h-4" /> Add Product
+          </button>
+        )}
       </div>
 
       {/* Summary Cards */}
@@ -180,7 +189,7 @@ const Products = () => {
                 <th className="px-6 py-4">Stock</th>
                 <th className="px-6 py-4">Min Stock</th>
                 <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4 text-right">Actions</th>
+                {canManage && <th className="px-6 py-4 text-right">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -213,22 +222,24 @@ const Products = () => {
                         {status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => handleOpenModal('edit', product)} className="p-1.5 text-slate-400 hover:text-blue-600 rounded-md hover:bg-blue-50" title="Edit">
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        <button onClick={() => handleDelete(product.id)} className="p-1.5 text-slate-400 hover:text-rose-600 rounded-md hover:bg-rose-50" title="Delete">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
+                    {canManage && (
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button onClick={() => handleOpenModal('edit', product)} className="p-1.5 text-slate-400 hover:text-blue-600 rounded-md hover:bg-blue-50" title="Edit">
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => handleDelete(product.id)} className="p-1.5 text-slate-400 hover:text-rose-600 rounded-md hover:bg-rose-50" title="Delete">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 );
               })}
               {products.length === 0 && (
                 <tr>
-                  <td colSpan="7" className="px-6 py-8 text-center text-slate-500">No products found.</td>
+                  <td colSpan={canManage ? 7 : 6} className="px-6 py-8 text-center text-slate-500">No products found.</td>
                 </tr>
               )}
             </tbody>

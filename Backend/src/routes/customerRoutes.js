@@ -14,10 +14,10 @@ const { createFollowUp, getFollowUps } = require("../controllers/followUpControl
 
 const router = express.Router();
 
-// ACCOUNTS can view customers and follow-ups
-router.get("/", authenticate, authorizeRoles("ADMIN", "SALES", "ACCOUNTS"), getCustomers);
-router.get("/:id", authenticate, authorizeRoles("ADMIN", "SALES", "ACCOUNTS"), getCustomerById);
-router.get("/:customerId/followups", authenticate, authorizeRoles("ADMIN", "SALES", "ACCOUNTS"), getFollowUps);
+// ACCOUNTS and WAREHOUSE can view customers
+router.get("/", authenticate, authorizeRoles("ADMIN", "SALES", "ACCOUNTS", "WAREHOUSE"), getCustomers);
+router.get("/:id", authenticate, authorizeRoles("ADMIN", "SALES", "ACCOUNTS", "WAREHOUSE"), getCustomerById);
+router.get("/:customerId/followups", authenticate, authorizeRoles("ADMIN", "SALES", "ACCOUNTS", "WAREHOUSE"), getFollowUps);
 
 // SALES and ADMIN can create/update customers and follow-ups
 router.post("/", authenticate, authorizeRoles("ADMIN", "SALES"), createCustomer);

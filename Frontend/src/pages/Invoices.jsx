@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Plus, Search, Filter, Download, Eye, MoreVertical, Edit2, Trash2, Printer } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import Modal from '../components/Modal';
 
 const Invoices = () => {
+  const { user } = useOutletContext();
+  const canManage = user?.role === 'ADMIN' || user?.role === 'ACCOUNTS';
+
   const [invoices, setInvoices] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -42,11 +45,13 @@ const Invoices = () => {
   };
 
   const handleOpenCreateModal = () => {
+    if (!canManage) return;
     setFormData({ customerId: customers.length > 0 ? customers[0].id : '', amount: '' });
     setIsCreateModalOpen(true);
   };
 
   const handleOpenStatusModal = (invoice) => {
+    if (!canManage) return;
     setCurrentInvoice(invoice);
     setNewStatus(invoice.status);
     setIsStatusModalOpen(true);
@@ -59,6 +64,7 @@ const Invoices = () => {
 
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
+    if (!canManage) return;
     try {
       await axios.post('http://localhost:5000/api/invoices', {
         customerId: Number(formData.customerId),
@@ -73,6 +79,7 @@ const Invoices = () => {
 
   const handleStatusSubmit = async (e) => {
     e.preventDefault();
+    if (!canManage) return;
     try {
       await axios.put(`http://localhost:5000/api/invoices/${currentInvoice.id}/status`, { status: newStatus }, { withCredentials: true });
       setIsStatusModalOpen(false);
@@ -83,6 +90,7 @@ const Invoices = () => {
   };
 
   const handleDelete = async (id) => {
+    if (!canManage) return;
     if (window.confirm("Are you sure you want to delete this invoice?")) {
       try {
         await axios.delete(`http://localhost:5000/api/invoices/${id}`, { withCredentials: true });
@@ -115,9 +123,11 @@ const Invoices = () => {
           <h2 className="text-2xl font-bold text-slate-900 mb-1">Invoices</h2>
           <p className="text-sm text-slate-500">Manage billing and payments</p>
         </div>
-        <button onClick={handleOpenCreateModal} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
-          <Plus className="w-4 h-4" /> Create Invoice
-        </button>
+        {canManage && (
+          <button onClick={handleOpenCreateModal} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
+            <Plus className="w-4 h-4" /> Create Invoice
+          </button>
+        )}
       </div>
 
       {/* Main Table Area */}
@@ -171,15 +181,19 @@ const Invoices = () => {
                     <td className="px-6 py-4">{getStatusBadge(inv.status)}</td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end opacity-0 group-hover:opacity-100 transition-opacity gap-2">
-                        <button onClick={() => handleOpenStatusModal(inv)} className="p-1.5 text-slate-400 hover:text-blue-600 rounded-md hover:bg-blue-50" title="Update Status">
-                          <Edit2 className="w-4 h-4" />
-                        </button>
+                        {canManage && (
+                          <button onClick={() => handleOpenStatusModal(inv)} className="p-1.5 text-slate-400 hover:text-blue-600 rounded-md hover:bg-blue-50" title="Update Status">
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                        )}
                         <button onClick={() => window.print()} className="p-1.5 text-slate-400 hover:text-emerald-600 rounded-md hover:bg-emerald-50" title="Print">
                           <Printer className="w-4 h-4" />
                         </button>
-                        <button onClick={() => handleDelete(inv.id)} className="p-1.5 text-slate-400 hover:text-rose-600 rounded-md hover:bg-rose-50" title="Delete">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        {canManage && (
+                          <button onClick={() => handleDelete(inv.id)} className="p-1.5 text-slate-400 hover:text-rose-600 rounded-md hover:bg-rose-50" title="Delete">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

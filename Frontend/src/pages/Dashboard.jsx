@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Users, FileText, Package, ArrowUpRight, PackageOpen, CalendarClock, AlertCircle } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 
 const Dashboard = () => {
   const [data, setData] = useState(null);
@@ -38,23 +38,29 @@ const Dashboard = () => {
   if (!data) return null;
 
   const hasLowStock = data.statistics.products.lowStock > 0;
+  const { user } = useOutletContext();
+  
+  const showUsersCard = user?.role === 'ADMIN';
+  const showStockCard = user?.role === 'ADMIN' || user?.role === 'WAREHOUSE' || user?.role === 'SALES';
 
   return (
     <div className="animate-in fade-in duration-500 font-sans pb-12">
       
       {/* Header */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-slate-900 mb-1">Admin Dashboard</h2>
-        <p className="text-sm text-slate-500">Overview of the entire business</p>
+        <h2 className="text-2xl font-bold text-slate-900 mb-1">{user?.role === 'ADMIN' ? 'Admin Dashboard' : `${user?.role} Dashboard`}</h2>
+        <p className="text-sm text-slate-500">Overview of the business</p>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {/* Active Users */}
-        <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm flex flex-col">
-          <div className="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider">Active Users</div>
-          <div className="text-4xl font-bold text-slate-900">{data.statistics.users.active}</div>
-        </div>
+        {showUsersCard && (
+          <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm flex flex-col">
+            <div className="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider">Active Users</div>
+            <div className="text-4xl font-bold text-slate-900">{data.statistics.users.active}</div>
+          </div>
+        )}
 
         {/* Active Customers */}
         <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm flex flex-col">
@@ -63,13 +69,15 @@ const Dashboard = () => {
         </div>
 
         {/* Low Stock Warning */}
-        <div className={`p-6 rounded-2xl shadow-sm flex flex-col border ${hasLowStock ? 'bg-red-50 border-red-200' : 'bg-white border-slate-200'}`}>
-          <div className={`text-sm font-semibold mb-4 uppercase tracking-wider ${hasLowStock ? 'text-red-600' : 'text-slate-500'}`}>Low Stock Products</div>
-          <div className={`text-4xl font-bold ${hasLowStock ? 'text-red-700' : 'text-slate-900'} flex items-center gap-2`}>
-            {data.statistics.products.lowStock}
-            {hasLowStock && <span className="text-2xl">🔴</span>}
+        {showStockCard && (
+          <div className={`p-6 rounded-2xl shadow-sm flex flex-col border ${hasLowStock ? 'bg-red-50 border-red-200' : 'bg-white border-slate-200'}`}>
+            <div className={`text-sm font-semibold mb-4 uppercase tracking-wider ${hasLowStock ? 'text-red-600' : 'text-slate-500'}`}>Low Stock Products</div>
+            <div className={`text-4xl font-bold ${hasLowStock ? 'text-red-700' : 'text-slate-900'} flex items-center gap-2`}>
+              {data.statistics.products.lowStock}
+              {hasLowStock && <span className="text-2xl">🔴</span>}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Main Grid Area */}
