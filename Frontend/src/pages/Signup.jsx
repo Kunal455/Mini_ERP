@@ -8,8 +8,7 @@ const Signup = () => {
     name: '',
     email: '',
     password: '',
-    confirmPassword: '',
-    role: 'SALES'
+    confirmPassword: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -38,8 +37,7 @@ const Signup = () => {
       const response = await API.post('/api/auth/signup', {
         name: formData.name,
         email: formData.email,
-        password: formData.password,
-        role: formData.role
+        password: formData.password
       });
 
       if (response.data.success) {
@@ -106,30 +104,7 @@ const Signup = () => {
               </div>
             </div>
 
-            {/* ROLE */}
-            <div className="space-y-1.5">
-              <label className="text-sm font-bold text-slate-800">Role</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                  <ShieldCheck className="h-5 w-5" />
-                </div>
-                <select
-                  name="role"
-                  value={formData.role || 'SALES'}
-                  onChange={handleChange}
-                  required
-                  className="w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors bg-white appearance-none"
-                >
-                  <option value="ADMIN">ADMIN</option>
-                  <option value="SALES">SALES</option>
-                  <option value="WAREHOUSE">WAREHOUSE</option>
-                  <option value="ACCOUNTS">ACCOUNTS</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                </div>
-              </div>
-            </div>
+
 
             {/* PASSWORD */}
             <div className="space-y-1.5">

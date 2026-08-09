@@ -10,15 +10,10 @@ const authCookieOptions = {
 
 const signup = async (req, res) => {
     try {
-        const { name, email, password, role } = req.body;
+        const { name, email, password } = req.body;
 
-        if (!name || !email || !password || !role) {
+        if (!name || !email || !password) {
             return res.status(400).json({ success: false, message: "All fields are required" });
-        }
-
-        const validRoles = ["ADMIN", "SALES", "WAREHOUSE", "ACCOUNTS"];
-        if (!validRoles.includes(role)) {
-            return res.status(400).json({ success: false, message: "Invalid role" });
         }
 
         const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -28,12 +23,15 @@ const signup = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        const userCount = await prisma.user.count();
+        const assignedRole = userCount === 0 ? "ADMIN" : "SALES";
+
         const newUser = await prisma.user.create({
             data: {
                 name,
                 email,
                 password: hashedPassword,
-                role
+                role: assignedRole
             }
         });
 
