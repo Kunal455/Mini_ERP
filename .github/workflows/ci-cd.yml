@@ -17,7 +17,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: './Frontend/package-lock.json'
 
@@ -39,7 +39,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: './Backend/package-lock.json'
 
@@ -75,7 +75,7 @@ jobs:
         with:
           context: ./Frontend
           push: ${{ github.event_name == 'push' }}
-          tags: ghcr.io/${{ github.repository_owner }}/mini-erp-frontend:latest
+          tags: ghcr.io/kunal455/mini-erp-frontend:latest
           build-args: |
             VITE_API_URL=https://mini-erp-qbz6.onrender.com
 
@@ -84,4 +84,4 @@ jobs:
         with:
           context: ./Backend
           push: ${{ github.event_name == 'push' }}
-          tags: ghcr.io/${{ github.repository_owner }}/mini-erp-backend:latest
+          tags: ghcr.io/kunal455/mini-erp-backend:latest
