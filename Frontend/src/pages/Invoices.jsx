@@ -13,6 +13,9 @@ const Invoices = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('ALL');
+
   // Modals
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
@@ -142,14 +145,23 @@ const Invoices = () => {
             <input 
               type="text" 
               placeholder="Search invoices..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
             />
           </div>
 
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
-              <Filter className="w-4 h-4" /> Filter
-            </button>
+            <select 
+              value={filterStatus} 
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="px-3 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors outline-none"
+            >
+              <option value="ALL">All Status</option>
+              <option value="PENDING">Pending</option>
+              <option value="PAID">Paid</option>
+              <option value="OVERDUE">Overdue</option>
+            </select>
           </div>
         </div>
 
@@ -167,7 +179,13 @@ const Invoices = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {invoices.map((inv) => {
+              {invoices.filter(inv => {
+                const searchMatch = (inv.invoiceNumber || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                    (inv.customer?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    (inv.customer?.businessName || '').toLowerCase().includes(searchTerm.toLowerCase());
+                const filterMatch = filterStatus === 'ALL' || inv.status === filterStatus;
+                return searchMatch && filterMatch;
+              }).map((inv) => {
                 const dateStr = new Date(inv.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
                 return (
                   <tr key={inv.id} className="hover:bg-slate-50/50 transition-colors group">
@@ -194,7 +212,13 @@ const Invoices = () => {
                   </tr>
                 );
               })}
-              {invoices.length === 0 && (
+              {invoices.filter(inv => {
+                const searchMatch = (inv.invoiceNumber || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                    (inv.customer?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    (inv.customer?.businessName || '').toLowerCase().includes(searchTerm.toLowerCase());
+                const filterMatch = filterStatus === 'ALL' || inv.status === filterStatus;
+                return searchMatch && filterMatch;
+              }).length === 0 && (
                 <tr>
                   <td colSpan="6" className="px-6 py-8 text-center text-slate-500">No invoices found.</td>
                 </tr>

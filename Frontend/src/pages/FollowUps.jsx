@@ -9,6 +9,10 @@ const FollowUps = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterDate, setFilterDate] = useState('ALL');
+  const [filterPriority, setFilterPriority] = useState('ALL');
+
   // Modals
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   
@@ -109,19 +113,28 @@ const FollowUps = () => {
             <input 
               type="text" 
               placeholder="Search follow-ups..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
             />
           </div>
 
           <div className="flex items-center gap-3">
             <div className="flex bg-slate-50 p-1 rounded-lg border border-slate-200">
-              <button className="px-3 py-1.5 text-sm font-medium bg-white shadow-sm border border-slate-200 rounded-md text-slate-800">All</button>
-              <button className="px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-800">Today</button>
-              <button className="px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-800">Upcoming</button>
+              <button onClick={() => setFilterDate('ALL')} className={`px-3 py-1.5 text-sm font-medium rounded-md ${filterDate === 'ALL' ? 'bg-white shadow-sm border border-slate-200 text-slate-800' : 'text-slate-500 hover:text-slate-800'}`}>All</button>
+              <button onClick={() => setFilterDate('TODAY')} className={`px-3 py-1.5 text-sm font-medium rounded-md ${filterDate === 'TODAY' ? 'bg-white shadow-sm border border-slate-200 text-slate-800' : 'text-slate-500 hover:text-slate-800'}`}>Today</button>
+              <button onClick={() => setFilterDate('UPCOMING')} className={`px-3 py-1.5 text-sm font-medium rounded-md ${filterDate === 'UPCOMING' ? 'bg-white shadow-sm border border-slate-200 text-slate-800' : 'text-slate-500 hover:text-slate-800'}`}>Upcoming</button>
             </div>
-            <button className="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
-              <Filter className="w-4 h-4" /> Filter
-            </button>
+            <select 
+              value={filterPriority} 
+              onChange={(e) => setFilterPriority(e.target.value)}
+              className="px-3 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors outline-none"
+            >
+              <option value="ALL">All Priorities</option>
+              <option value="HIGH">High</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="LOW">Low</option>
+            </select>
           </div>
         </div>
 
@@ -139,7 +152,28 @@ const FollowUps = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {followUps.map((f) => {
+              {followUps.filter(f => {
+                const dateObj = new Date(f.followUpDate);
+                const isToday = dateObj.toDateString() === new Date().toDateString();
+                const isPast = dateObj < new Date() && !isToday;
+
+                const text = (f.note || '').toLowerCase();
+                let priority = 'MEDIUM';
+                if (text.includes('urgent') || text.includes('high')) priority = 'HIGH';
+                else if (text.includes('low')) priority = 'LOW';
+
+                const searchMatch = (f.customer?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                    (f.customer?.businessName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    text.includes(searchTerm.toLowerCase());
+                
+                let dateMatch = true;
+                if (filterDate === 'TODAY') dateMatch = isToday;
+                if (filterDate === 'UPCOMING') dateMatch = !isToday && !isPast;
+
+                const priorityMatch = filterPriority === 'ALL' || priority === filterPriority;
+
+                return searchMatch && dateMatch && priorityMatch;
+              }).map((f) => {
                 const dateObj = new Date(f.followUpDate);
                 const isToday = dateObj.toDateString() === new Date().toDateString();
                 const isPast = dateObj < new Date() && !isToday;
@@ -173,9 +207,30 @@ const FollowUps = () => {
                   </tr>
                 );
               })}
-              {followUps.length === 0 && (
+              {followUps.filter(f => {
+                const dateObj = new Date(f.followUpDate);
+                const isToday = dateObj.toDateString() === new Date().toDateString();
+                const isPast = dateObj < new Date() && !isToday;
+
+                const text = (f.note || '').toLowerCase();
+                let priority = 'MEDIUM';
+                if (text.includes('urgent') || text.includes('high')) priority = 'HIGH';
+                else if (text.includes('low')) priority = 'LOW';
+
+                const searchMatch = (f.customer?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                    (f.customer?.businessName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    text.includes(searchTerm.toLowerCase());
+                
+                let dateMatch = true;
+                if (filterDate === 'TODAY') dateMatch = isToday;
+                if (filterDate === 'UPCOMING') dateMatch = !isToday && !isPast;
+
+                const priorityMatch = filterPriority === 'ALL' || priority === filterPriority;
+
+                return searchMatch && dateMatch && priorityMatch;
+              }).length === 0 && (
                 <tr>
-                  <td colSpan="6" className="px-6 py-8 text-center text-slate-500">No follow-ups found.</td>
+                  <td colSpan="6" className="px-6 py-12 text-center text-slate-500">No follow-ups found.</td>
                 </tr>
               )}
             </tbody>

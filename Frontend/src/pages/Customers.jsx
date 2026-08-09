@@ -12,6 +12,9 @@ const Customers = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('ALL');
+
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('create'); // 'create' or 'edit'
@@ -167,14 +170,22 @@ const Customers = () => {
             <input 
               type="text" 
               placeholder="Search customers..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
             />
           </div>
 
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
-              <Filter className="w-4 h-4" /> Filter
-            </button>
+            <select 
+              value={filterStatus} 
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="px-3 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors outline-none"
+            >
+              <option value="ALL">All Status</option>
+              <option value="ACTIVE">Active</option>
+              <option value="INACTIVE">Inactive</option>
+            </select>
           </div>
         </div>
 
@@ -191,7 +202,14 @@ const Customers = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {customers.map((customer) => (
+              {customers.filter(c => {
+                const searchMatch = (c.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                    (c.businessName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    (c.mobile || '').includes(searchTerm);
+                const filterMatch = filterStatus === 'ALL' || 
+                                    (filterStatus === 'ACTIVE' ? c.status === 'ACTIVE' : c.status !== 'ACTIVE');
+                return searchMatch && filterMatch;
+              }).map((customer) => (
                 <tr key={customer.id} className="hover:bg-slate-50/50 transition-colors group">
                   <td className="px-6 py-4">
                     <div className="font-bold text-slate-900">{customer.businessName || customer.name}</div>
@@ -230,7 +248,14 @@ const Customers = () => {
                   </td>
                 </tr>
               ))}
-              {customers.length === 0 && (
+              {customers.filter(c => {
+                const searchMatch = (c.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                    (c.businessName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    (c.mobile || '').includes(searchTerm);
+                const filterMatch = filterStatus === 'ALL' || 
+                                    (filterStatus === 'ACTIVE' ? c.status === 'ACTIVE' : c.status !== 'ACTIVE');
+                return searchMatch && filterMatch;
+              }).length === 0 && (
                 <tr>
                   <td colSpan="5" className="px-6 py-8 text-center text-slate-500">No customers found.</td>
                 </tr>

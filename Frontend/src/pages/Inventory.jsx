@@ -12,6 +12,9 @@ const Inventory = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStock, setFilterStock] = useState('ALL');
+
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
@@ -132,14 +135,23 @@ const Inventory = () => {
             <input 
               type="text" 
               placeholder="Search product..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
             />
           </div>
 
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
-              <Filter className="w-4 h-4" /> Filter
-            </button>
+            <select 
+              value={filterStock} 
+              onChange={(e) => setFilterStock(e.target.value)}
+              className="px-3 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors outline-none"
+            >
+              <option value="ALL">All Stock</option>
+              <option value="IN_STOCK">In Stock</option>
+              <option value="LOW_STOCK">Low Stock</option>
+              <option value="OUT_OF_STOCK">Out of Stock</option>
+            </select>
           </div>
         </div>
 
@@ -157,7 +169,17 @@ const Inventory = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {products.map((product) => {
+              {products.filter(p => {
+                const searchMatch = (p.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                    (p.sku || '').toLowerCase().includes(searchTerm.toLowerCase());
+                
+                let filterMatch = true;
+                if (filterStock === 'IN_STOCK') filterMatch = p.currentStock > p.minimumStock;
+                if (filterStock === 'LOW_STOCK') filterMatch = p.currentStock <= p.minimumStock && p.currentStock > 0;
+                if (filterStock === 'OUT_OF_STOCK') filterMatch = p.currentStock === 0;
+
+                return searchMatch && filterMatch;
+              }).map((product) => {
                 let status = "Good";
                 let statusColor = "bg-emerald-50 text-emerald-600";
                 
@@ -194,9 +216,19 @@ const Inventory = () => {
                   </tr>
                 );
               })}
-              {products.length === 0 && (
+              {products.filter(p => {
+                const searchMatch = (p.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                    (p.sku || '').toLowerCase().includes(searchTerm.toLowerCase());
+                
+                let filterMatch = true;
+                if (filterStock === 'IN_STOCK') filterMatch = p.currentStock > p.minimumStock;
+                if (filterStock === 'LOW_STOCK') filterMatch = p.currentStock <= p.minimumStock && p.currentStock > 0;
+                if (filterStock === 'OUT_OF_STOCK') filterMatch = p.currentStock === 0;
+
+                return searchMatch && filterMatch;
+              }).length === 0 && (
                 <tr>
-                  <td colSpan={canManage ? 6 : 5} className="px-6 py-8 text-center text-slate-500">No inventory found.</td>
+                  <td colSpan={canManage ? 6 : 5} className="px-6 py-8 text-center text-slate-500">No products found in inventory.</td>
                 </tr>
               )}
             </tbody>

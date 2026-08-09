@@ -8,6 +8,9 @@ const PurchaseOrders = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('ALL');
+
   // Modals
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
@@ -129,14 +132,22 @@ const PurchaseOrders = () => {
             <input 
               type="text" 
               placeholder="Search POs..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
             />
           </div>
 
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
-              <Filter className="w-4 h-4" /> Filter
-            </button>
+            <select 
+              value={filterStatus} 
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="px-3 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors outline-none"
+            >
+              <option value="ALL">All Status</option>
+              <option value="DRAFT">Draft</option>
+              <option value="RECEIVED">Received</option>
+            </select>
           </div>
         </div>
 
@@ -155,7 +166,12 @@ const PurchaseOrders = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {purchaseOrders.map((po) => {
+              {purchaseOrders.filter(po => {
+                const searchMatch = (po.supplierName || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                    (`PO-${po.id}`).toLowerCase().includes(searchTerm.toLowerCase());
+                const filterMatch = filterStatus === 'ALL' || po.status === filterStatus;
+                return searchMatch && filterMatch;
+              }).map((po) => {
                 const dateStr = new Date(po.orderDate).toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
                 const deliveryStr = po.expectedDeliveryDate ? new Date(po.expectedDeliveryDate).toLocaleDateString('en-US', { month: 'short', day: '2-digit' }) : 'N/A';
                 return (
@@ -179,7 +195,12 @@ const PurchaseOrders = () => {
                   </tr>
                 );
               })}
-              {purchaseOrders.length === 0 && (
+              {purchaseOrders.filter(po => {
+                const searchMatch = (po.supplierName || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                    (`PO-${po.id}`).toLowerCase().includes(searchTerm.toLowerCase());
+                const filterMatch = filterStatus === 'ALL' || po.status === filterStatus;
+                return searchMatch && filterMatch;
+              }).length === 0 && (
                 <tr>
                   <td colSpan="7" className="px-6 py-8 text-center text-slate-500">No purchase orders found.</td>
                 </tr>
