@@ -159,6 +159,7 @@ const ChallanDetails = () => {
           </div>
         </div>
       </div>
+      </div>
 
       {/* Actions */}
       <div className="flex justify-end gap-4 hide-on-print">
