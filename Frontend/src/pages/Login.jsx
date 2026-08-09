@@ -51,9 +51,7 @@ const Login = () => {
         <div className="w-full max-w-md">
           
           <h2 className="text-3xl font-bold text-slate-900 mb-2">Sign in to your account</h2>
-          <p className="text-slate-500 mb-8">
-            Don't have an account? <Link to="/signup" className="text-indigo-600 hover:text-indigo-700 font-medium">Create one free</Link>
-          </p>
+
 
 
 

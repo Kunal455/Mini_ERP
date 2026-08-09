@@ -8,46 +8,7 @@ const authCookieOptions = {
     sameSite: "none" // Required for Vercel -> Render communication
 };
 
-const signup = async (req, res) => {
-    try {
-        const { name, email, password } = req.body;
 
-        if (!name || !email || !password) {
-            return res.status(400).json({ success: false, message: "All fields are required" });
-        }
-
-        const existingUser = await prisma.user.findUnique({ where: { email } });
-        if (existingUser) {
-            return res.status(409).json({ success: false, message: "User already exists" });
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const userCount = await prisma.user.count();
-        const assignedRole = userCount === 0 ? "ADMIN" : "SALES";
-
-        const newUser = await prisma.user.create({
-            data: {
-                name,
-                email,
-                password: hashedPassword,
-                role: assignedRole
-            }
-        });
-
-        const { password: _, ...userWithoutPassword } = newUser;
-
-        return res.status(201).json({
-            success: true,
-            message: "User created successfully",
-            data: userWithoutPassword
-        });
-
-    } catch (error) {
-        console.error("Signup error:", error);
-        return res.status(500).json({ success: false, message: "Internal server error" });
-    }
-};
 
 const login = async (req, res) => {
     try {
@@ -138,7 +99,6 @@ const updateMe = async (req, res) => {
 };
 
 module.exports = {
-    signup,
     login,
     logout,
     getMe,

@@ -73,8 +73,11 @@ app.use("/api/invoices", invoiceRoutes);
 // Global Error Handler
 app.use(errorHandler);
 
+const seedAdmin = require("./utils/seedAdmin");
+
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
     console.log(`Server running on port ${PORT}`);
+    await seedAdmin();
 });
