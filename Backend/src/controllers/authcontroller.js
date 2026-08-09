@@ -2,11 +2,10 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const prisma = require("../config/prisma");
 
-const isProduction = process.env.NODE_ENV === "production";
 const authCookieOptions = {
     httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? "none" : "lax"
+    secure: true, // Required for cross-site cookies
+    sameSite: "none" // Required for Vercel -> Render communication
 };
 
 const signup = async (req, res) => {
