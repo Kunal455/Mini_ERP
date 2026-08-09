@@ -51,7 +51,7 @@ const FollowUps = () => {
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/follow-ups', {
+      await axios.post(`http://localhost:5000/api/customers/${formData.customerId}/followups`, {
         ...formData,
         customerId: Number(formData.customerId)
       }, { withCredentials: true });
