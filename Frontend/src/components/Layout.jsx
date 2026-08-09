@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Users, Box, Layers, FileText, Settings, Search, Moon, Bell, ShoppingCart, Receipt, CalendarClock, BarChart2, User, LogOut } from 'lucide-react';
-import API from './api/axios';
+import API from '../api/axios';
 import Modal from './Modal';
 
 const permissions = {
