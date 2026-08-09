@@ -33,6 +33,31 @@ const seedAdmin = async () => {
             });
             console.log(`Default admin password updated for email: ${adminEmail}`);
         }
+
+        // Seed additional test accounts for the case study evaluator
+        const testAccounts = [
+            { email: "raj@gmail.com", name: "Raj (Sales)", role: "SALES", password: "12345678" },
+            { email: "rohan@gmail.com", name: "Rohan (Warehouse)", role: "WAREHOUSE", password: "12345678" },
+            { email: "rahul@gmail.com", name: "Rahul (Accounts)", role: "ACCOUNTS", password: "12345678" }
+        ];
+
+        for (const account of testAccounts) {
+            const existing = await prisma.user.findUnique({ where: { email: account.email } });
+            if (!existing) {
+                const hashedTestPassword = await bcrypt.hash(account.password, 10);
+                await prisma.user.create({
+                    data: {
+                        email: account.email,
+                        name: account.name,
+                        role: account.role,
+                        password: hashedTestPassword,
+                        isActive: true
+                    }
+                });
+                console.log(`Test account created: ${account.email}`);
+            }
+        }
+
     } catch (error) {
         console.error("Error seeding admin user:", error);
     }

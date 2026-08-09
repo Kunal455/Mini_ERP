@@ -12,6 +12,9 @@ A complete full-stack ERP and CRM solution tailored for wholesale and distributi
 | Role      | Email                   | Password  |
 |-----------|-------------------------|-----------|
 | Admin     | kk6547015@gmail.com     | 12345678  |
+| Sales     | raj@gmail.com           | 12345678  |
+| Warehouse | rohan@gmail.com         | 12345678  |
+| Accounts  | rahul@gmail.com         | 12345678  |
 
 *(Note: The Admin can create new users with Sales, Warehouse, and Accounts roles directly from the Users dashboard in the live app).*
 
