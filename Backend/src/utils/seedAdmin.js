@@ -7,8 +7,8 @@ const seedAdmin = async () => {
         const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
         const adminName = process.env.ADMIN_NAME || "System Admin";
 
-        const existingAdmin = await prisma.user.findFirst({
-            where: { role: "ADMIN" }
+        const existingAdmin = await prisma.user.findUnique({
+            where: { email: adminEmail }
         });
 
         if (!existingAdmin) {
