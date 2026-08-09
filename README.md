@@ -4,7 +4,7 @@ A complete full-stack ERP and CRM solution tailored for wholesale and distributi
 
 ## 🔗 Live Demo Links
 
-- **Frontend Application:** https://mini-erp-git-main-kunal-kumars-projects-c3b97c3f.vercel.app
+- **Frontend Application:** https://mini-erp-gilt-sigma.vercel.app/
 - **Backend API:** https://mini-erp-qbz6.onrender.com
 
 ### 🔑 Test Credentials
