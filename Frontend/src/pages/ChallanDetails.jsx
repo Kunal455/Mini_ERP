@@ -3,7 +3,6 @@ import { useParams, Link, useNavigate, useOutletContext } from 'react-router-dom
 import axios from 'axios';
 import { ArrowLeft, Edit2, Printer, Download } from 'lucide-react';
 import Modal from '../components/Modal';
-import html2pdf from 'html2pdf.js';
 
 const ChallanDetails = () => {
   const { user } = useOutletContext();
@@ -48,15 +47,8 @@ const ChallanDetails = () => {
   };
 
   const handleDownloadPDF = () => {
-    const element = printRef.current;
-    const opt = {
-      margin:       0.5,
-      filename:     `Challan_${challan.challanNumber}.pdf`,
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2 },
-      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-    };
-    html2pdf().set(opt).from(element).save();
+    alert("To download as a PDF, please select 'Save as PDF' in the destination dropdown of the print dialog.");
+    window.print();
   };
 
   const handleStatusUpdate = async (action) => {
