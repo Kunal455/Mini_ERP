@@ -81,7 +81,7 @@ const Invoices = () => {
     e.preventDefault();
     if (!canManage) return;
     try {
-      await axios.put(`http://localhost:5000/api/invoices/${currentInvoice.id}/status`, { status: newStatus }, { withCredentials: true });
+      await axios.put(`http://localhost:5000/api/invoices/${currentInvoice.id}`, { status: newStatus }, { withCredentials: true });
       setIsStatusModalOpen(false);
       fetchData();
     } catch (err) {
