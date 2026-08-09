@@ -2,6 +2,13 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const prisma = require("../config/prisma");
 
+const isProduction = process.env.NODE_ENV === "production";
+const authCookieOptions = {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax"
+};
+
 const signup = async (req, res) => {
     try {
         const { name, email, password, role } = req.body;
@@ -75,9 +82,7 @@ const login = async (req, res) => {
         const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
 
         res.cookie("token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            ...authCookieOptions,
             maxAge: 24 * 60 * 60 * 1000 // 1 day
         });
 
@@ -97,9 +102,7 @@ const login = async (req, res) => {
 
 const logout = async (req, res) => {
     res.clearCookie("token", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        ...authCookieOptions
     });
     return res.status(200).json({ success: true, message: "Logged out successfully" });
 };

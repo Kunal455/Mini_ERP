@@ -19,9 +19,14 @@ const { errorHandler } = require("./middleware/errorMiddleware");
 
 const app = express();
 
+
+
 app.use(
     cors({
-        origin: ["mini-69671083p-kunal-kumars-projects-c3b97c3f.vercel.app","mini-erp-git-main-kunal-kumars-projects-c3b97c3f.vercel.app","http://localhost:5173", "http://localhost:5174","https://mini-erp-gilt-sigma.vercel.app", process.env.FRONTEND_URL],
+        origin: function (origin, callback) {
+            // Allow all origins by reflecting the request origin
+            callback(null, origin || true);
+        },
         credentials: true
     })
 );
