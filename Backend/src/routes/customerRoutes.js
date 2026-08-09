@@ -1,7 +1,14 @@
 const express = require("express");
 const { authenticate } = require("../middleware/authMiddleware");
 const { authorizeRoles } = require("../middleware/roleMiddleware");
-const { createCustomer, getCustomers, getCustomerById, updateCustomer, deleteCustomer } = require("../controllers/customerController");
+const { 
+    createCustomer, 
+    getCustomers, 
+    getCustomerById, 
+    updateCustomer, 
+    deleteCustomer, 
+    updateCustomerStatus 
+} = require("../controllers/customerController");
 
 const { createFollowUp, getFollowUps } = require("../controllers/followUpController");
 

@@ -153,10 +153,23 @@ const updateProductStatus = async (req, res, next) => {
     }
 };
 
+const deleteProduct = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        await prisma.product.delete({
+            where: { id: Number(id) }
+        });
+        return res.status(200).json({ success: true, message: "Product deleted successfully" });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     createProduct,
     getProducts,
     getProductById,
     updateProduct,
-    updateProductStatus
+    updateProductStatus,
+    deleteProduct
 };

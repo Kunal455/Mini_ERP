@@ -6,7 +6,7 @@ const getDashboard = async (req, res, next) => {
             totalUsers, activeUsers,
             totalCustomers, activeCustomers,
             totalProducts, activeProducts,
-            lowStockProducts,
+            lowStockProducts, lowStockProductsCount,
             draftChallans, confirmedChallans, cancelledChallans
         ] = await Promise.all([
             prisma.user.count(),
@@ -18,8 +18,8 @@ const getDashboard = async (req, res, next) => {
             prisma.product.count(),
             prisma.product.count({ where: { isActive: true } }),
             
-            // Raw query equivalent logic for low stock can't be done directly with Prisma aggregate in a single pass easily if comparing columns, but minimumStock is a field. 
-            // In Prisma, comparing two columns in the same table requires a workaround or raw query. 
+            // Raw query to fetch names of low stock products
+            prisma.$queryRaw`SELECT name FROM Product WHERE currentStock <= minimumStock AND isActive = true LIMIT 3`,
             prisma.$queryRaw`SELECT COUNT(*) as count FROM Product WHERE currentStock <= minimumStock AND isActive = true`,
             
             prisma.challan.count({ where: { status: 'DRAFT' } }),
@@ -27,13 +27,23 @@ const getDashboard = async (req, res, next) => {
             prisma.challan.count({ where: { status: 'CANCELLED' } })
         ]);
 
-        const lowStockCount = Number(lowStockProducts[0]?.count || 0);
+        const lowStockNames = lowStockProducts.map(p => p.name);
+        const lowStockCount = Number(lowStockProductsCount[0]?.count || 0);
 
-        const recentChallans = await prisma.challan.findMany({
+        const recentChallansRaw = await prisma.challan.findMany({
             take: 5,
             orderBy: { createdAt: 'desc' },
-            include: { customer: { select: { name: true, businessName: true } } }
+            include: { 
+                customer: { select: { name: true, businessName: true } },
+                items: { select: { totalPrice: true } }
+            }
         });
+
+        // Compute total amount for each challan
+        const recentChallans = recentChallansRaw.map(challan => ({
+            ...challan,
+            amount: challan.items.reduce((sum, item) => sum + item.totalPrice, 0)
+        }));
 
         const recentMovements = await prisma.stockMovement.findMany({
             take: 5,
@@ -55,7 +65,7 @@ const getDashboard = async (req, res, next) => {
                 statistics: {
                     users: { total: totalUsers, active: activeUsers },
                     customers: { total: totalCustomers, active: activeCustomers },
-                    products: { total: totalProducts, active: activeProducts, lowStock: lowStockCount },
+                    products: { total: totalProducts, active: activeProducts, lowStock: lowStockCount, lowStockNames },
                     challans: { draft: draftChallans, confirmed: confirmedChallans, cancelled: cancelledChallans }
                 },
                 recentChallans,

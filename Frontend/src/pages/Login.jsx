@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Star, Users, FileText, BarChart3, ShieldCheck, Zap } from 'lucide-react';
 
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -28,11 +30,10 @@ const Login = () => {
         email: formData.email,
         password: formData.password
       }, {
-        withCredentials: true // Crucial for receiving the httpOnly JWT cookie
+        withCredentials: true
       });
 
       if (response.data.success) {
-        // Redirect to dashboard on success
         navigate('/dashboard');
       }
     } catch (err) {
@@ -43,128 +44,176 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex h-screen overflow-hidden bg-white font-sans">
       
-      {/* LEFT PANEL */}
-      <div className="hidden lg:flex flex-col justify-between w-1/2 bg-brand-dark p-12 text-white">
-        
-        <div>
-          {/* Logo / Badge */}
-          <div className="inline-flex items-center justify-center border border-slate-600 px-3 py-1 mb-16 rounded-sm">
-            <span className="text-xs font-mono tracking-widest text-slate-300 mr-3 border-r border-slate-600 pr-3">FR</span>
-            <span className="text-xs font-mono tracking-widest text-slate-300">OPERATIONS PORTAL</span>
-          </div>
-
-          <h1 className="text-6xl font-serif mb-6 text-white tracking-tight">FundsRoom</h1>
-          
-          <p className="text-xl text-slate-300 font-sans font-light leading-relaxed max-w-lg mb-16">
-            One ledger for sales, warehouse, and accounts — every entry attributed, every role in its lane.
-          </p>
-
-          {/* Activity Feed */}
-          <div className="space-y-6 text-sm font-mono tracking-wide">
-            
-            <div className="grid grid-cols-4 gap-4 items-center border-b border-slate-800/50 pb-4 opacity-40">
-              <span className="col-span-1 text-slate-400">SALES</span>
-              <span className="col-span-3 text-slate-300">New lead logged</span>
-            </div>
-            
-            <div className="grid grid-cols-4 gap-4 items-center border-b border-slate-800/50 pb-4 opacity-50">
-              <span className="col-span-1 text-slate-400">WAREHOUSE</span>
-              <span className="col-span-3 text-slate-300">Stock received — Bay 4</span>
-            </div>
-            
-            <div className="grid grid-cols-4 gap-4 items-center border-b border-slate-800/50 pb-4 opacity-60">
-              <span className="col-span-1 text-slate-400">ACCOUNTS</span>
-              <span className="col-span-3 text-slate-300">Invoice #2291 settled</span>
-            </div>
-            
-            <div className="grid grid-cols-4 gap-4 items-center border-b border-slate-800/50 pb-4 opacity-70">
-              <span className="col-span-1 text-slate-400">ADMIN</span>
-              <span className="col-span-3 text-slate-300">Access review completed</span>
-            </div>
-            
-            <div className="grid grid-cols-4 gap-4 items-center border-b border-slate-800/50 pb-4 opacity-80">
-              <span className="col-span-1 text-slate-400">SALES</span>
-              <span className="col-span-3 text-slate-300">Quote sent to client</span>
-            </div>
-            
-            {/* Highlighted Feed Item */}
-            <div className="grid grid-cols-4 gap-4 items-center border-b border-slate-700 pb-4 opacity-100">
-              <span className="col-span-1 text-white font-medium">WAREHOUSE</span>
-              <span className="col-span-3 text-white font-medium">Dispatch note generated</span>
-            </div>
-
-          </div>
-        </div>
-
-        <div className="mt-12 text-xs font-mono tracking-widest text-slate-500">
-          MINI ERP · CRM · OPS
-        </div>
-
-      </div>
-
-      {/* RIGHT PANEL (FORM) */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 lg:p-24 bg-white">
+      {/* LEFT PANEL (FORM) */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 lg:p-24 overflow-y-auto">
         <div className="w-full max-w-md">
           
-          <h3 className="text-xs font-mono tracking-widest text-brand-light mb-4 uppercase">Welcome Back</h3>
-          <h2 className="text-4xl sm:text-5xl font-serif text-brand-dark mb-6 tracking-tight">Sign in</h2>
-          <p className="text-slate-500 mb-16 text-base leading-relaxed">
-            Enter your credentials to access your workspace.
+          <h2 className="text-3xl font-bold text-slate-900 mb-2">Sign in to your account</h2>
+          <p className="text-slate-500 mb-8">
+            Don't have an account? <Link to="/signup" className="text-indigo-600 hover:text-indigo-700 font-medium">Create one free</Link>
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-12">
+
+
+          <form onSubmit={handleSubmit} className="space-y-5">
             
             {/* EMAIL */}
-            <div className="relative group">
-              <label className="absolute -top-6 left-0 text-xs font-mono tracking-widest text-brand-light uppercase flex items-center gap-2">
-                <span className="text-[10px]">01</span> EMAIL
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="admin@fundsroom.com"
-                required
-                className="w-full bg-transparent border-b border-slate-200 py-2 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-brand-dark transition-colors"
-              />
+            <div className="space-y-1.5">
+              <label className="text-sm font-bold text-slate-800">Email address</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <Mail className="h-5 w-5" />
+                </div>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="you@example.com"
+                  required
+                  className="w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-lg text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+                />
+              </div>
             </div>
 
             {/* PASSWORD */}
-            <div className="relative group mt-12">
-              <label className="absolute -top-6 left-0 text-xs font-mono tracking-widest text-brand-light uppercase flex items-center gap-2">
-                <span className="text-[10px]">02</span> PASSWORD
+            <div className="space-y-1.5">
+              <label className="text-sm font-bold text-slate-800">Password</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <Lock className="h-5 w-5" />
+                </div>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Enter your password"
+                  required
+                  className="w-full pl-10 pr-10 py-2.5 border border-slate-200 rounded-lg text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+                />
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-slate-400 hover:text-slate-600" onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-1">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500/20" />
+                <span className="text-sm text-slate-600">Remember me</span>
               </label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Enter your password"
-                required
-                className="w-full bg-transparent border-b border-slate-200 py-2 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-brand-dark transition-colors"
-              />
+              <a href="#" className="text-sm text-indigo-600 hover:text-indigo-700 font-medium">Forgot password?</a>
             </div>
 
             {error && (
-              <div className="text-red-500 text-sm mt-4">{error}</div>
+              <div className="text-red-500 text-sm">{error}</div>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-brand-dark hover:bg-slate-800 text-white font-mono text-sm tracking-[0.2em] py-4 mt-12 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-3 rounded-full flex items-center justify-center gap-2 transition-colors disabled:opacity-70 disabled:cursor-not-allowed mt-4"
             >
-              {loading ? 'AUTHENTICATING...' : 'SIGN IN'}
+              {loading ? 'Signing in...' : 'Sign in'}
+              {!loading && <ArrowRight className="w-4 h-4" />}
             </button>
             
           </form>
 
-          <p className="mt-8 text-slate-500 text-sm">
-            Don't have an account? <a href="/signup" className="text-brand-light hover:text-brand-dark underline decoration-1 underline-offset-4 transition-colors">Create one</a>
+          <p className="mt-8 text-xs text-slate-500 text-center leading-relaxed">
+            By signing in you agree to our <a href="#" className="text-indigo-600 hover:underline">Terms of Service</a> and <a href="#" className="text-indigo-600 hover:underline">Privacy Policy</a>.
           </p>
+
+        </div>
+      </div>
+      
+      {/* RIGHT PANEL (INFO) */}
+      <div className="hidden lg:flex flex-col w-1/2 bg-gradient-to-br from-[#2a1a5e] to-[#4c3198] text-white p-10 lg:p-12 relative overflow-y-auto">
+        
+        {/* Decorative background glow */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/20 rounded-full blur-[100px] translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
+
+        <div className="relative z-10 h-full flex flex-col justify-center">
+          
+          {/* Top Badges */}
+          <div className="flex items-center gap-3 mb-8">
+            <div className="flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 backdrop-blur-sm">
+              <Zap className="w-4 h-4" />
+              <span className="font-semibold text-sm">FundsRoom <span className="bg-white/20 text-xs px-1.5 py-0.5 rounded ml-1">AI</span></span>
+            </div>
+            <div className="bg-white/10 border border-white/20 rounded-full px-4 py-1.5 backdrop-blur-sm text-sm">
+              ✨ AI-Native Operations CRM
+            </div>
+          </div>
+
+          <div className="flex-1 flex flex-col justify-center">
+            <h1 className="text-3xl lg:text-4xl font-bold mb-3 leading-tight">
+              Welcome back to your operations command center
+            </h1>
+            <p className="text-indigo-200 text-base mb-8">
+              Your customers, inventory, and challans are waiting for you.
+            </p>
+
+            <div className="space-y-5">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-indigo-500/30 flex items-center justify-center flex-shrink-0 border border-indigo-400/30">
+                  <Users className="w-5 h-5 text-indigo-300" />
+                </div>
+                <span className="text-indigo-100 font-medium">Centralized customer management</span>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-orange-500/30 flex items-center justify-center flex-shrink-0 border border-orange-400/30">
+                  <FileText className="w-5 h-5 text-orange-300" />
+                </div>
+                <span className="text-indigo-100 font-medium">Streamlined challan generation</span>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-emerald-500/30 flex items-center justify-center flex-shrink-0 border border-emerald-400/30">
+                  <BarChart3 className="w-5 h-5 text-emerald-300" />
+                </div>
+                <span className="text-indigo-100 font-medium">Real-time inventory & insights</span>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-rose-500/30 flex items-center justify-center flex-shrink-0 border border-rose-400/30">
+                  <ShieldCheck className="w-5 h-5 text-rose-300" />
+                </div>
+                <span className="text-indigo-100 font-medium">Role-based access control</span>
+              </div>
+            </div>
+
+            <div className="mt-8 flex items-center gap-2">
+              <div className="flex text-amber-400">
+                <Star className="w-4 h-4 fill-current" />
+                <Star className="w-4 h-4 fill-current" />
+                <Star className="w-4 h-4 fill-current" />
+                <Star className="w-4 h-4 fill-current" />
+                <Star className="w-4 h-4 fill-current" />
+              </div>
+              <span className="text-indigo-200 text-sm">Trusted by 50+ businesses</span>
+            </div>
+          </div>
+
+          {/* Bottom Stat Cards */}
+          <div className="grid grid-cols-3 gap-3 mt-8">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-md">
+              <div className="text-2xl font-bold mb-1">12K+</div>
+              <div className="text-xs text-indigo-200">Customers managed</div>
+            </div>
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-md">
+              <div className="text-2xl font-bold mb-1">1.5L+</div>
+              <div className="text-xs text-indigo-200">Challans generated</div>
+            </div>
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-md">
+              <div className="text-2xl font-bold mb-1">3.4x</div>
+              <div className="text-xs text-indigo-200">Faster operations</div>
+            </div>
+          </div>
 
         </div>
       </div>

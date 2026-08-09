@@ -5,9 +5,9 @@ const { createChallan, getChallans, getChallanById, updateChallan, confirmChalla
 
 const router = express.Router();
 
-// ACCOUNTS can view challans
-router.get("/", authenticate, authorizeRoles("ADMIN", "SALES", "ACCOUNTS"), getChallans);
-router.get("/:id", authenticate, authorizeRoles("ADMIN", "SALES", "ACCOUNTS"), getChallanById);
+// ACCOUNTS and WAREHOUSE can view challans
+router.get("/", authenticate, authorizeRoles("ADMIN", "SALES", "ACCOUNTS", "WAREHOUSE"), getChallans);
+router.get("/:id", authenticate, authorizeRoles("ADMIN", "SALES", "ACCOUNTS", "WAREHOUSE"), getChallanById);
 
 // SALES and ADMIN can manage challans
 router.post("/", authenticate, authorizeRoles("ADMIN", "SALES"), createChallan);

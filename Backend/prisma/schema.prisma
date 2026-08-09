@@ -51,6 +51,8 @@ model User {
   followUps      FollowUp[]
   stockMovements StockMovement[]
   challans       Challan[]
+  purchaseOrders PurchaseOrder[]
+  invoices       Invoice[]
 }
 
 model Customer {
@@ -74,6 +76,7 @@ model Customer {
 
   followUps FollowUp[]
   challans  Challan[]
+  invoices  Invoice[]
 }
 
 model FollowUp {
@@ -107,6 +110,7 @@ model Product {
 
   stockMovements StockMovement[]
   challanItems   ChallanItem[]
+  invoiceItems   InvoiceItem[]
 }
 
 model StockMovement {
@@ -155,4 +159,74 @@ model ChallanItem {
   unitPrice   Float
   quantity    Int
   totalPrice  Float
+}
+
+enum PurchaseOrderStatus {
+  PENDING
+  APPROVED
+  RECEIVED
+  CANCELLED
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+model PurchaseOrder {
+  id       Int                 @id @default(autoincrement())
+  poNumber String              @unique
+  supplier String
+  amount   Float
+  status   PurchaseOrderStatus @default(PENDING)
+
+  createdById Int
+  createdBy   User @relation(fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items PurchaseOrderItem[]
+}
+
+model PurchaseOrderItem {
+  id              Int           @id @default(autoincrement())
+  purchaseOrderId Int
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+
+  productName String
+  quantity    Int
+  unitPrice   Float
+}
+
+model Invoice {
+  id            Int      @id @default(autoincrement())
+  invoiceNumber String   @unique
+  customerId    Int
+  customer      Customer @relation(fields: [customerId], references: [id])
+
+  amount Float
+  status InvoiceStatus @default(PENDING)
+
+  createdById Int
+  createdBy   User @relation(fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items InvoiceItem[]
+}
+
+model InvoiceItem {
+  id        Int     @id @default(autoincrement())
+  invoiceId Int
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+
+  quantity  Int
+  unitPrice Float
 }

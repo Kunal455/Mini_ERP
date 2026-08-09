@@ -1,5 +1,17 @@
 const prisma = require("../config/prisma");
 
+const getAllFollowUps = async (req, res, next) => {
+    try {
+        const followUps = await prisma.followUp.findMany({
+            include: { customer: { select: { name: true, businessName: true } } },
+            orderBy: { followUpDate: 'asc' }
+        });
+        return res.status(200).json({ success: true, data: followUps });
+    } catch (error) {
+        next(error);
+    }
+};
+
 const createFollowUp = async (req, res, next) => {
     try {
         const { customerId } = req.params;
@@ -92,6 +104,7 @@ const deleteFollowUp = async (req, res, next) => {
 };
 
 module.exports = {
+    getAllFollowUps,
     createFollowUp,
     getFollowUps,
     updateFollowUp,

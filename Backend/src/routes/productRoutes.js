@@ -1,7 +1,7 @@
 const express = require("express");
 const { authenticate } = require("../middleware/authMiddleware");
 const { authorizeRoles } = require("../middleware/roleMiddleware");
-const { createProduct, getProducts, getProductById, updateProduct, updateProductStatus } = require("../controllers/productController");
+const { createProduct, getProducts, getProductById, updateProduct, updateProductStatus, deleteProduct } = require("../controllers/productController");
 const { getProductStockHistory } = require("../controllers/stockController");
 
 const router = express.Router();
@@ -15,5 +15,6 @@ router.get("/:id/stock-history", authenticate, authorizeRoles("ADMIN", "SALES", 
 router.post("/", authenticate, authorizeRoles("ADMIN", "WAREHOUSE"), createProduct);
 router.put("/:id", authenticate, authorizeRoles("ADMIN", "WAREHOUSE"), updateProduct);
 router.patch("/:id/status", authenticate, authorizeRoles("ADMIN", "WAREHOUSE"), updateProductStatus);
+router.delete("/:id", authenticate, authorizeRoles("ADMIN"), deleteProduct);
 
 module.exports = router;

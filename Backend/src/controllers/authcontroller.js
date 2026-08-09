@@ -99,17 +99,48 @@ const logout = async (req, res) => {
     res.clearCookie("token", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict"
+        sameSite: "strict",
     });
+    return res.status(200).json({ success: true, message: "Logged out successfully" });
+};
 
-    return res.status(200).json({
-        success: true,
-        message: "Logout successful"
-    });
+const getMe = async (req, res) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: req.user.id }
+        });
+        if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+        const { password, ...userWithoutPassword } = user;
+        return res.status(200).json({ success: true, data: userWithoutPassword });
+    } catch (error) {
+        console.error("GetMe error:", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
+const updateMe = async (req, res) => {
+    try {
+        const { name } = req.body;
+        if (!name) return res.status(400).json({ success: false, message: "Name is required" });
+
+        const updatedUser = await prisma.user.update({
+            where: { id: req.user.id },
+            data: { name }
+        });
+
+        const { password, ...userWithoutPassword } = updatedUser;
+        return res.status(200).json({ success: true, data: userWithoutPassword });
+    } catch (error) {
+        console.error("UpdateMe error:", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
 };
 
 module.exports = {
     signup,
     login,
-    logout
+    logout,
+    getMe,
+    updateMe
 };

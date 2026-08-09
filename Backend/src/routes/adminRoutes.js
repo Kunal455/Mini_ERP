@@ -5,7 +5,7 @@ const { getDashboard } = require("../controllers/adminController");
 
 const router = express.Router();
 
-router.use(authenticate, authorizeRoles("ADMIN"));
+router.use(authenticate, authorizeRoles("ADMIN", "SALES", "WAREHOUSE", "ACCOUNTS"));
 
 router.get("/dashboard", getDashboard);
 

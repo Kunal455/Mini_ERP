@@ -13,13 +13,15 @@ const productRoutes = require("./routes/productRoutes");
 const stockRoutes = require("./routes/stockRoutes");
 const challanRoutes = require("./routes/challanRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const purchaseOrderRoutes = require("./routes/purchaseOrderRoutes");
+const invoiceRoutes = require("./routes/invoiceRoutes");
 const { errorHandler } = require("./middleware/errorMiddleware");
 
 const app = express();
 
 app.use(
     cors({
-        origin: "http://localhost:3000",
+        origin: ["http://localhost:5173", "http://localhost:5174"],
         credentials: true
     })
 );
@@ -37,11 +39,13 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/customers", customerRoutes);
-app.use("/api/followups", followUpRoutes);
+app.use("/api/follow-ups", followUpRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/stock", stockRoutes);
 app.use("/api/challans", challanRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/purchase-orders", purchaseOrderRoutes);
+app.use("/api/invoices", invoiceRoutes);
 
 // Global Error Handler
 app.use(errorHandler);
