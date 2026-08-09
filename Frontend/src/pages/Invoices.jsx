@@ -183,9 +183,7 @@ const Invoices = () => {
                             <Edit2 className="w-4 h-4" />
                           </button>
                         )}
-                        <button onClick={() => window.print()} className="p-1.5 text-slate-400 hover:text-emerald-600 rounded-md hover:bg-emerald-50" title="Print">
-                          <Printer className="w-4 h-4" />
-                        </button>
+
                         {canManage && (
                           <button onClick={() => handleDelete(inv.id)} className="p-1.5 text-slate-400 hover:text-rose-600 rounded-md hover:bg-rose-50" title="Delete">
                             <Trash2 className="w-4 h-4" />
